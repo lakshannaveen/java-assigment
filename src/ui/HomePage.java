@@ -11,19 +11,19 @@ public class HomePage extends JFrame {
         setLocationRelativeTo(null);
 
         // Create the panel and apply styles
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
+        JPanel mainPanel = new JPanel(new BorderLayout());
 
+        JLabel titleLabel = new JLabel("Expense Tracker", JLabel.CENTER);
         JLabel welcomeLabel = new JLabel("Welcome to Expense Tracker", JLabel.CENTER);
         JButton loginButton = new JButton("Login");
         JButton registerButton = new JButton("Register");
 
         // Apply styles from HomePageStyle
-        HomePageStyle.applyStyles(welcomeLabel, loginButton, registerButton, panel);
+        HomePageStyle.applyStyles(titleLabel, welcomeLabel, loginButton, registerButton, mainPanel);
 
         // Create button panel and add buttons
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout());
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        buttonPanel.setOpaque(false);
         buttonPanel.add(loginButton);
         buttonPanel.add(registerButton);
 
@@ -39,11 +39,22 @@ public class HomePage extends JFrame {
         });
 
         // Add components to the main panel
-        panel.add(welcomeLabel, BorderLayout.NORTH);
-        panel.add(buttonPanel, BorderLayout.CENTER);
+        mainPanel.add(titleLabel, BorderLayout.NORTH);
+        mainPanel.add(welcomeLabel, BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         // Add panel to the frame
-        add(panel);
+        add(mainPanel);
         setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        // Run the HomePage
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new HomePage();
+            }
+        });
     }
 }

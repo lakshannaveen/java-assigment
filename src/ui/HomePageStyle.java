@@ -2,23 +2,37 @@ package ui;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.Timer;
 
 public class HomePageStyle {
 
-    public static void applyStyles(JLabel welcomeLabel, JButton loginButton, JButton registerButton, JPanel panel) {
+    public static void applyStyles(JLabel titleLabel, JLabel welcomeLabel, JButton loginButton, JButton registerButton, JPanel panel) {
         // Set styles for components
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 22));
+        titleLabel.setForeground(new Color(34, 139, 34)); // Green color
+
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 18));
         welcomeLabel.setForeground(Color.DARK_GRAY);
 
         // Set button styles with green color
-        loginButton.setPreferredSize(new Dimension(100, 40));
-        registerButton.setPreferredSize(new Dimension(100, 40));
+        loginButton.setPreferredSize(new Dimension(120, 40));
+        registerButton.setPreferredSize(new Dimension(120, 40));
         loginButton.setBackground(new Color(34, 139, 34)); // Green color
         registerButton.setBackground(new Color(34, 139, 34)); // Green color
         loginButton.setForeground(Color.WHITE);
         registerButton.setForeground(Color.WHITE);
+        loginButton.setFont(new Font("Arial", Font.BOLD, 14));
+        registerButton.setFont(new Font("Arial", Font.BOLD, 14));
+
+        // Set button borders and make them rounded
+        loginButton.setBorder(BorderFactory.createLineBorder(new Color(34, 139, 34), 2));
+        registerButton.setBorder(BorderFactory.createLineBorder(new Color(34, 139, 34), 2));
+        loginButton.setFocusPainted(false);
+        registerButton.setFocusPainted(false);
+        loginButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        registerButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         // Set panel background
         panel.setBackground(new Color(230, 240, 250)); // Light background color

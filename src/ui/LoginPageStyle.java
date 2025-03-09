@@ -58,8 +58,9 @@ public class LoginPageStyle {
         loginButton.setFont(new Font("Arial", Font.BOLD, 14));
 
         // Style the back button (left top as back icon)
-        backButton.setIcon(new ImageIcon("path_to_back_icon.png"));
-        backButton.setContentAreaFilled(false);
+        backButton.setFont(new Font("Arial", Font.BOLD, 14));
+        backButton.setForeground(new Color(0, 128, 0)); // Green color
         backButton.setBorderPainted(false);
+        backButton.setContentAreaFilled(false);
     }
 }

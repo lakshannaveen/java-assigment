@@ -37,7 +37,9 @@ public class RegisterPage extends JFrame {
         passwordField = new JPasswordField(20);
 
         registerButton = new JButton("Register");
-        backButton = new JButton();
+        backButton = new JButton("Back");
+        backButton.setContentAreaFilled(false);
+        backButton.setBorderPainted(false);
 
         // Apply styles using the RegisterPageStyle class
         RegisterPageStyle.applyStyles(formPanel, nameField, emailField, passwordField, registerButton, backButton);

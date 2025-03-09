@@ -35,7 +35,9 @@ public class LoginPage extends JFrame {
         passwordField = new JPasswordField(20);
 
         loginButton = new JButton("Login");
-        backButton = new JButton();
+        backButton = new JButton("Back");
+        backButton.setContentAreaFilled(false);
+        backButton.setBorderPainted(false);
 
         // Apply styles using the LoginPageStyle class
         LoginPageStyle.applyStyles(formPanel, emailField, passwordField, loginButton, backButton);
