@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class RegisterPage extends JFrame {
+
     public RegisterPage() {
         setTitle("Register - Expense Tracker");
         setSize(400, 300);
@@ -24,6 +25,9 @@ public class RegisterPage extends JFrame {
 
         JButton registerButton = new JButton("Register");
         JButton backButton = new JButton("Back");
+
+        // Apply styles using the RegisterPageStyle class
+        RegisterPageStyle.applyStyles(panel, nameField, emailField, passwordField, registerButton, backButton);
 
         // Add components to panel
         panel.add(nameLabel);
@@ -58,5 +62,15 @@ public class RegisterPage extends JFrame {
 
         add(panel, BorderLayout.CENTER);
         setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        // Run the RegisterPage
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new RegisterPage();
+            }
+        });
     }
 }
