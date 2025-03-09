@@ -32,6 +32,9 @@ public class LoginPage extends JFrame {
         loginButton = new JButton("Login");
         backButton = new JButton("Back");
 
+        // Apply styles using the LoginPageStyle class
+        LoginPageStyle.applyStyles(panel, emailField, passwordField, loginButton, backButton);
+
         // Button actions
         loginButton.addActionListener(new ActionListener() {
             @Override
