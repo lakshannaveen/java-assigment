@@ -18,22 +18,26 @@ public class LoginPage extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Create the panel and apply styles
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(4, 2));
+        // Create the main panel and apply styles
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBorder(BorderFactory.createTitledBorder("Login Form"));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
         // Create and add the components
         JLabel emailLabel = new JLabel("Email:");
-        emailField = new JTextField();
+        emailField = new JTextField(20);
 
         JLabel passwordLabel = new JLabel("Password:");
-        passwordField = new JPasswordField();
+        passwordField = new JPasswordField(20);
 
         loginButton = new JButton("Login");
-        backButton = new JButton("Back");
+        backButton = new JButton();
 
         // Apply styles using the LoginPageStyle class
-        LoginPageStyle.applyStyles(panel, emailField, passwordField, loginButton, backButton);
+        LoginPageStyle.applyStyles(formPanel, emailField, passwordField, loginButton, backButton);
 
         // Button actions
         loginButton.addActionListener(new ActionListener() {
@@ -62,16 +66,39 @@ public class LoginPage extends JFrame {
             }
         });
 
-        // Add components to the panel
-        panel.add(emailLabel);
-        panel.add(emailField);
-        panel.add(passwordLabel);
-        panel.add(passwordField);
-        panel.add(loginButton);
-        panel.add(backButton);
+        // Add components to the form panel with GridBagLayout
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        formPanel.add(emailLabel, gbc);
 
-        // Add panel to the frame
-        add(panel);
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        formPanel.add(emailField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        formPanel.add(passwordLabel, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        formPanel.add(passwordField, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        formPanel.add(loginButton, gbc);
+
+        // Add back button to the top-left corner of the main panel
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.add(backButton, BorderLayout.WEST);
+
+        // Add panels to the main panel
+        mainPanel.add(topPanel, BorderLayout.NORTH);
+        mainPanel.add(formPanel, BorderLayout.CENTER);
+
+        // Add main panel to the frame
+        add(mainPanel);
         setVisible(true);
     }
 

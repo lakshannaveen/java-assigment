@@ -1,7 +1,8 @@
 package ui;
 
+import java.awt.Color;
 import javax.swing.*;
-import java.awt.*;
+import java.awt.Font;
 
 public class RegisterPageStyle {
 
@@ -13,7 +14,6 @@ public class RegisterPageStyle {
         nameField.setFont(new Font("Arial", Font.PLAIN, 14));
         nameField.setForeground(Color.GRAY);
         nameField.setText("Enter Name");
-        nameField.setForeground(Color.GRAY);
         nameField.setCaretColor(Color.BLACK); // Change caret color to black
         nameField.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
@@ -33,7 +33,6 @@ public class RegisterPageStyle {
         emailField.setFont(new Font("Arial", Font.PLAIN, 14));
         emailField.setForeground(Color.GRAY);
         emailField.setText("Enter Email");
-        emailField.setForeground(Color.GRAY);
         emailField.setCaretColor(Color.BLACK); // Change caret color to black
         emailField.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
@@ -54,7 +53,7 @@ public class RegisterPageStyle {
         passwordField.setForeground(Color.GRAY);
         passwordField.setEchoChar('*');
         passwordField.setText("Enter Password");
-        passwordField.setForeground(Color.GRAY);
+        passwordField.setCaretColor(Color.BLACK); // Change caret color to black
         passwordField.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 if (String.valueOf(passwordField.getPassword()).equals("Enter Password")) {

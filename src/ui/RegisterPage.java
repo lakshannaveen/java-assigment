@@ -5,39 +5,41 @@ import java.awt.*;
 
 public class RegisterPage extends JFrame {
 
+    private JTextField nameField;
+    private JTextField emailField;
+    private JPasswordField passwordField;
+    private JButton registerButton;
+    private JButton backButton;
+
     public RegisterPage() {
         setTitle("Register - Expense Tracker");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
-        setLayout(new BorderLayout());
 
-        // Create a panel to hold the form components
-        JPanel panel = new JPanel(new GridLayout(4, 2, 10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        // Create the main panel and apply styles
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBorder(BorderFactory.createTitledBorder("Register Form"));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
+        // Create and add the components
         JLabel nameLabel = new JLabel("Name:");
-        JTextField nameField = new JTextField();
-        JLabel emailLabel = new JLabel("Email:");
-        JTextField emailField = new JTextField();
-        JLabel passwordLabel = new JLabel("Password:");
-        JPasswordField passwordField = new JPasswordField();
+        nameField = new JTextField(20);
 
-        JButton registerButton = new JButton("Register");
-        JButton backButton = new JButton("Back");
+        JLabel emailLabel = new JLabel("Email:");
+        emailField = new JTextField(20);
+
+        JLabel passwordLabel = new JLabel("Password:");
+        passwordField = new JPasswordField(20);
+
+        registerButton = new JButton("Register");
+        backButton = new JButton();
 
         // Apply styles using the RegisterPageStyle class
-        RegisterPageStyle.applyStyles(panel, nameField, emailField, passwordField, registerButton, backButton);
-
-        // Add components to panel
-        panel.add(nameLabel);
-        panel.add(nameField);
-        panel.add(emailLabel);
-        panel.add(emailField);
-        panel.add(passwordLabel);
-        panel.add(passwordField);
-        panel.add(registerButton);
-        panel.add(backButton);
+        RegisterPageStyle.applyStyles(formPanel, nameField, emailField, passwordField, registerButton, backButton);
 
         // Register button action
         registerButton.addActionListener(e -> {
@@ -60,7 +62,47 @@ public class RegisterPage extends JFrame {
             new HomePage(); // Navigate back to HomePage
         });
 
-        add(panel, BorderLayout.CENTER);
+        // Add components to the form panel with GridBagLayout
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        formPanel.add(nameLabel, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        formPanel.add(nameField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        formPanel.add(emailLabel, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        formPanel.add(emailField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        formPanel.add(passwordLabel, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        formPanel.add(passwordField, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        formPanel.add(registerButton, gbc);
+
+        // Add back button to the top-left corner of the main panel
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.add(backButton, BorderLayout.WEST);
+
+        // Add panels to the main panel
+        mainPanel.add(topPanel, BorderLayout.NORTH);
+        mainPanel.add(formPanel, BorderLayout.CENTER);
+
+        // Add main panel to the frame
+        add(mainPanel);
         setVisible(true);
     }
 
