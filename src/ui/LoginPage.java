@@ -1,5 +1,11 @@
 package ui;
 
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -13,13 +19,16 @@ public class LoginPage extends JFrame {
     private JButton loginButton;
     private JButton backButton;
 
+    private static final String CONNECTION_STRING = "mongodb+srv://naveen:uD4DxPM4lBhZ4gOH@cluster0.lbyqk.mongodb.net/test?retryWrites=true&w=majority&appName=Cluster0";
+    private static final String DATABASE_NAME = "test";
+    private static final String COLLECTION_NAME = "users";
+
     public LoginPage() {
         setTitle("Login - Expense Tracker");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Create the main panel and apply styles
         JPanel mainPanel = new JPanel(new BorderLayout());
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBorder(BorderFactory.createTitledBorder("Login Form"));
@@ -27,7 +36,6 @@ public class LoginPage extends JFrame {
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Create and add the components
         JLabel emailLabel = new JLabel("Email:");
         emailField = new JTextField(20);
 
@@ -39,32 +47,28 @@ public class LoginPage extends JFrame {
         backButton.setContentAreaFilled(false);
         backButton.setBorderPainted(false);
 
-        // Apply styles using the LoginPageStyle class
         LoginPageStyle.applyStyles(formPanel, emailField, passwordField, loginButton, backButton);
 
-        // Button actions
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String email = emailField.getText();
-                char[] password = passwordField.getPassword();
+                String password = new String(passwordField.getPassword());
 
                 if (!isValidEmail(email)) {
                     JOptionPane.showMessageDialog(null, "Invalid email format.");
                     return;
                 }
 
-                if (password.length < 8) {
+                if (password.length() < 8) {
                     JOptionPane.showMessageDialog(null, "Password must be at least 8 characters long.");
                     return;
                 }
 
-                // Placeholder validation logic
-                if (email.equals("user@example.com") && String.valueOf(password).equals("password123")) {
+                if (authenticateUser(email, password)) {
                     JOptionPane.showMessageDialog(null, "Login Successful!");
-                    // Navigate to the next page (e.g., HomePage or Dashboard)
                     dispose();
-                    new HomePage(); // Open Home Page or Dashboard
+                    new StartPage();
                 } else {
                     JOptionPane.showMessageDialog(null, "Invalid email or password.");
                 }
@@ -75,11 +79,10 @@ public class LoginPage extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
-                new HomePage(); // Go back to HomePage
+                new StartPage();
             }
         });
 
-        // Add components to the form panel with GridBagLayout
         gbc.gridx = 0;
         gbc.gridy = 0;
         formPanel.add(emailLabel, gbc);
@@ -102,17 +105,29 @@ public class LoginPage extends JFrame {
         gbc.anchor = GridBagConstraints.CENTER;
         formPanel.add(loginButton, gbc);
 
-        // Add back button to the top-left corner of the main panel
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(backButton, BorderLayout.WEST);
 
-        // Add panels to the main panel
         mainPanel.add(topPanel, BorderLayout.NORTH);
         mainPanel.add(formPanel, BorderLayout.CENTER);
 
-        // Add main panel to the frame
         add(mainPanel);
         setVisible(true);
+    }
+
+    private boolean authenticateUser(String email, String password) {
+        try (MongoClient mongoClient = MongoClients.create(CONNECTION_STRING)) {
+            MongoDatabase database = mongoClient.getDatabase(DATABASE_NAME);
+            MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
+
+            Document query = new Document("email", email).append("password", password);
+            Document user = collection.find(query).first();
+
+            return user != null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private boolean isValidEmail(String email) {
@@ -122,7 +137,6 @@ public class LoginPage extends JFrame {
     }
 
     public static void main(String[] args) {
-        // Run the LoginPage
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
