@@ -3,6 +3,8 @@ package ui;
 import javax.swing.*;
 import java.awt.*;
 import java.util.regex.Pattern;
+import controllers.UserController;
+import models.User;
 
 public class RegisterPage extends JFrame {
 
@@ -11,8 +13,11 @@ public class RegisterPage extends JFrame {
     private JPasswordField passwordField;
     private JButton registerButton;
     private JButton backButton;
+    private UserController userController;
 
     public RegisterPage() {
+        userController = new UserController();
+
         setTitle("Register - Expense Tracker");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -70,9 +75,14 @@ public class RegisterPage extends JFrame {
                 return;
             }
 
-            JOptionPane.showMessageDialog(this, "Registration Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
-            dispose(); // Close the register page
-            new HomePage(); // Redirect to HomePage
+            User user = new User(name, email, password);
+            if (userController.registerUser(user)) {
+                JOptionPane.showMessageDialog(this, "Registration Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                dispose(); // Close the register page
+                new HomePage(); // Redirect to HomePage
+            } else {
+                JOptionPane.showMessageDialog(this, "Registration Failed!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         // Back button action
