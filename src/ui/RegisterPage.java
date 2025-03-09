@@ -79,7 +79,7 @@ public class RegisterPage extends JFrame {
             if (userController.registerUser(user)) {
                 JOptionPane.showMessageDialog(this, "Registration Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 dispose(); // Close the register page
-                new HomePage(); // Redirect to HomePage
+                new StartPage(); // Redirect to StartPage
             } else {
                 JOptionPane.showMessageDialog(this, "Registration Failed!", "Error", JOptionPane.ERROR_MESSAGE);
             }
