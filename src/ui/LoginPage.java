@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.regex.Pattern;
 
 public class LoginPage extends JFrame {
 
@@ -45,6 +46,16 @@ public class LoginPage extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String email = emailField.getText();
                 char[] password = passwordField.getPassword();
+
+                if (!isValidEmail(email)) {
+                    JOptionPane.showMessageDialog(null, "Invalid email format.");
+                    return;
+                }
+
+                if (password.length < 8) {
+                    JOptionPane.showMessageDialog(null, "Password must be at least 8 characters long.");
+                    return;
+                }
 
                 // Placeholder validation logic
                 if (email.equals("user@example.com") && String.valueOf(password).equals("password123")) {
@@ -100,6 +111,12 @@ public class LoginPage extends JFrame {
         // Add main panel to the frame
         add(mainPanel);
         setVisible(true);
+    }
+
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+        Pattern pattern = Pattern.compile(emailRegex);
+        return pattern.matcher(email).matches();
     }
 
     public static void main(String[] args) {

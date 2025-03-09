@@ -2,6 +2,7 @@ package ui;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.regex.Pattern;
 
 public class RegisterPage extends JFrame {
 
@@ -49,11 +50,27 @@ public class RegisterPage extends JFrame {
 
             if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Please fill all fields!", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(this, "Registration Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                dispose(); // Close the register page
-                new HomePage(); // Redirect to HomePage
+                return;
             }
+
+            if (name.length() > 25) {
+                JOptionPane.showMessageDialog(this, "Name must not exceed 25 characters.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (!isValidEmail(email)) {
+                JOptionPane.showMessageDialog(this, "Invalid email format.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (password.length() < 8) {
+                JOptionPane.showMessageDialog(this, "Password must be at least 8 characters long.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            JOptionPane.showMessageDialog(this, "Registration Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            dispose(); // Close the register page
+            new HomePage(); // Redirect to HomePage
         });
 
         // Back button action
@@ -104,6 +121,12 @@ public class RegisterPage extends JFrame {
         // Add main panel to the frame
         add(mainPanel);
         setVisible(true);
+    }
+
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
+        Pattern pattern = Pattern.compile(emailRegex);
+        return pattern.matcher(email).matches();
     }
 
     public static void main(String[] args) {
