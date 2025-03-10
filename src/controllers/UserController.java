@@ -1,20 +1,22 @@
 package controllers;
 
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import models.User;
 import org.bson.Document;
+import database.MongoDBConnection; // Import the MongoDB connection class
 
 public class UserController {
-    private static final String CONNECTION_STRING =      "mongodb+srv://naveen:uD4DxPM4lBhZ4gOH@cluster0.lbyqk.mongodb.net/test?retryWrites=true&w=majority&appName=Cluster0";
-    private static final String DATABASE_NAME = "test";
     private static final String COLLECTION_NAME = "users";
+    private final MongoDatabase database; // Make it final to fix the warning
+
+    public UserController() {
+        MongoDBConnection mongoDBConnection = new MongoDBConnection();
+        this.database = mongoDBConnection.getDatabase();
+    }
 
     public boolean registerUser(User user) {
-        try (MongoClient mongoClient = MongoClients.create(CONNECTION_STRING)) {
-            MongoDatabase database = mongoClient.getDatabase(DATABASE_NAME);
+        try {
             MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
 
             Document userDoc = new Document("name", user.getName())
@@ -24,7 +26,7 @@ public class UserController {
             collection.insertOne(userDoc);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            e.printStackTrace(); // You can replace this with a proper logging framework
             return false;
         }
     }
