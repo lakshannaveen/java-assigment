@@ -88,9 +88,9 @@ public class LoginPage extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
-                new StartPage(""); // You can pass an empty string if no token is available
+                new HomePage(); // Navigate to HomePage.java instead of StartPage.java
             }
-        });
+    });
 
         gbc.gridx = 0;
         gbc.gridy = 0;
