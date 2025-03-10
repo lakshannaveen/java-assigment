@@ -8,17 +8,22 @@ import java.awt.event.FocusListener;
 public class ExpenseStyle {
 
     public static void styleButton(JButton button) {
-        button.setFont(new Font("Serif", Font.BOLD, 18));
-        button.setBackground(Color.GREEN);
-        button.setForeground(Color.BLACK);
+        button.setFont(new Font("SansSerif", Font.BOLD, 16));
+        button.setBackground(new Color(34, 153, 84)); // Darker Green
+        button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
-        button.setBorderPainted(false);
+        button.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(28, 125, 68), 2),
+                BorderFactory.createEmptyBorder(5, 15, 5, 15)
+        ));
         button.setOpaque(true);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
     public static void addPlaceholder(JTextField textField, String placeholder) {
         textField.setForeground(Color.GRAY);
         textField.setText(placeholder);
+        textField.setFont(new Font("SansSerif", Font.ITALIC, 14));
 
         textField.addFocusListener(new FocusListener() {
             @Override
@@ -26,6 +31,7 @@ public class ExpenseStyle {
                 if (textField.getText().equals(placeholder)) {
                     textField.setText("");
                     textField.setForeground(Color.BLACK);
+                    textField.setFont(new Font("SansSerif", Font.PLAIN, 14));
                 }
             }
 
@@ -34,6 +40,7 @@ public class ExpenseStyle {
                 if (textField.getText().isEmpty()) {
                     textField.setForeground(Color.GRAY);
                     textField.setText(placeholder);
+                    textField.setFont(new Font("SansSerif", Font.ITALIC, 14));
                 }
             }
         });

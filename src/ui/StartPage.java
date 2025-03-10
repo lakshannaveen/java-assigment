@@ -39,10 +39,11 @@ public class StartPage extends JFrame {
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new Expense();  // Navigate to Expense page
+                new Expense(token);  // Pass the token to Expense
                 dispose();  // Close current window
             }
         });
+
 
         // Button panel for layout
         JPanel buttonPanel = new JPanel(new GridBagLayout());

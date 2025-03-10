@@ -20,7 +20,7 @@ public class Expense extends JFrame {
     private JTextField expenseTypeField;
     private ExpenseController expenseController;
 
-    public Expense() {
+    public Expense(String token) {
         setTitle("Expense Tracker");
         setSize(400, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -35,7 +35,7 @@ public class Expense extends JFrame {
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new HomePage();
+                new StartPage(token);
                 dispose();
             }
         });
@@ -163,7 +163,7 @@ public class Expense extends JFrame {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new Expense();
+                new Expense("token"); // Replace with actual token logic
             }
         });
     }
