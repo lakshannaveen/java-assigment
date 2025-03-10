@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 public class StartPage extends JFrame {
     private ExpenseController expenseController;
     private String token;
+    private JTabbedPane tabbedPane;
 
     public StartPage(String token) {
         this.token = token; // Store the token
@@ -47,13 +48,17 @@ public class StartPage extends JFrame {
         mainPanel.add(welcomeLabel, BorderLayout.NORTH);
 
         // Tabbed pane to display expenses by pocket name
-        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane = new JTabbedPane();
         mainPanel.add(tabbedPane, BorderLayout.CENTER);
 
         // Fetch and display expenses
-        loadExpenses(email, tabbedPane);
+        loadExpenses(email);
 
-        // Start button to navigate to Expense page
+        // Start and Refresh buttons panel
+        JPanel buttonPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+
         JButton startButton = new JButton("Start My Expense");
         StartPageStyle.styleButton(startButton);  // Apply styling from your custom method
 
@@ -65,9 +70,20 @@ public class StartPage extends JFrame {
             }
         });
 
-        // Button panel for layout
-        JPanel buttonPanel = new JPanel(new GridBagLayout());
-        buttonPanel.add(startButton);
+        JButton refreshButton = new JButton("Refresh");
+        StartPageStyle.styleButton(refreshButton);  // Apply styling from your custom method
+
+        refreshButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loadExpenses(email);  // Reload expenses
+            }
+        });
+
+        gbc.gridx = 0;
+        buttonPanel.add(startButton, gbc);
+        gbc.gridx = 1;
+        buttonPanel.add(refreshButton, gbc);
 
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
@@ -76,7 +92,9 @@ public class StartPage extends JFrame {
         setVisible(true);
     }
 
-    private void loadExpenses(String email, JTabbedPane tabbedPane) {
+    private void loadExpenses(String email) {
+        tabbedPane.removeAll();  // Clear existing tabs
+
         List<ExpenseModel> expenses = expenseController.getExpensesByEmail(email);
 
         // Group expenses by pocket name
