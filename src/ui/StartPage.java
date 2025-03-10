@@ -9,7 +9,6 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,8 +18,10 @@ import java.util.stream.Collectors;
 
 public class StartPage extends JFrame {
     private ExpenseController expenseController;
+    private String token;
 
     public StartPage(String token) {
+        this.token = token; // Store the token
         // Decode the token to get the email
         String email = getEmailFromToken(token);
 
@@ -117,7 +118,7 @@ public class StartPage extends JFrame {
             addExpenseButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    new AddExpense();  // Navigate to AddExpense form
+                    new AddExpense(token, pocketName);  // Navigate to AddExpense form with token and pocketName
                 }
             });
 
