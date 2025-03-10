@@ -13,6 +13,9 @@ public class Expense extends JFrame {
 
     private JComboBox<String> monthComboBox;
     private JSpinner dateSpinner;
+    private JTextField pocketNameField;
+    private JTextField expenseNameField;
+    private JTextField expenseTypeField;
 
     public Expense() {
         setTitle("Expense Tracker");
@@ -49,7 +52,7 @@ public class Expense extends JFrame {
 
         // Pocket name
         JLabel pocketNameLabel = new JLabel("Pocket Name:");
-        JTextField pocketNameField = new JTextField();
+        pocketNameField = new JTextField();
         ExpenseStyle.addPlaceholder(pocketNameField, "Enter pocket name");
         formPanel.add(pocketNameLabel);
         formPanel.add(pocketNameField);
@@ -63,14 +66,14 @@ public class Expense extends JFrame {
 
         // Expense name (optional)
         JLabel expenseNameLabel = new JLabel("Expense Name (optional):");
-        JTextField expenseNameField = new JTextField();
+        expenseNameField = new JTextField();
         ExpenseStyle.addPlaceholder(expenseNameField, "Enter expense name");
         formPanel.add(expenseNameLabel);
         formPanel.add(expenseNameField);
 
         // Expense type (optional)
         JLabel expenseTypeLabel = new JLabel("Expense Type (optional):");
-        JTextField expenseTypeField = new JTextField();
+        expenseTypeField = new JTextField();
         ExpenseStyle.addPlaceholder(expenseTypeField, "Enter expense type");
         formPanel.add(expenseTypeLabel);
         formPanel.add(expenseTypeField);
@@ -93,30 +96,8 @@ public class Expense extends JFrame {
         submitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Handle form submission
-                String pocketName = pocketNameField.getText();
-                String selectedMonth = (String) monthComboBox.getSelectedItem();
-                String expenseName = expenseNameField.getText();
-                String expenseType = expenseTypeField.getText();
-                Date selectedDate = (Date) dateSpinner.getValue();
-
-                // Validate fields
-                if (pocketName.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Pocket Name is required", "Validation Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                if (selectedMonth == null) {
-                    JOptionPane.showMessageDialog(null, "Month selection is required", "Validation Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                // For now, just print the values
-                System.out.println("Pocket Name: " + pocketName);
-                System.out.println("Month: " + selectedMonth);
-                System.out.println("Expense Name: " + expenseName);
-                System.out.println("Expense Type: " + expenseType);
-                System.out.println("Date: " + selectedDate);
+                clearPlaceholders();
+                validateAndSubmitForm();
             }
         });
 
@@ -150,6 +131,53 @@ public class Expense extends JFrame {
         ((SpinnerDateModel) dateSpinner.getModel()).setStart(startDate);
         ((SpinnerDateModel) dateSpinner.getModel()).setEnd(endDate);
         dateSpinner.setValue(startDate);
+    }
+
+    private void clearPlaceholders() {
+        // Remove placeholders before validation
+        if (pocketNameField.getForeground() == Color.GRAY) {
+            pocketNameField.setText("");
+            pocketNameField.setForeground(Color.BLACK);
+        }
+        if (expenseNameField.getForeground() == Color.GRAY) {
+            expenseNameField.setText("");
+            expenseNameField.setForeground(Color.BLACK);
+        }
+        if (expenseTypeField.getForeground() == Color.GRAY) {
+            expenseTypeField.setText("");
+            expenseTypeField.setForeground(Color.BLACK);
+        }
+    }
+
+    private void validateAndSubmitForm() {
+        String pocketName = pocketNameField.getText();
+        String selectedMonth = (String) monthComboBox.getSelectedItem();
+        String expenseName = expenseNameField.getText();
+        String expenseType = expenseTypeField.getText();
+        Date selectedDate = (Date) dateSpinner.getValue();
+
+        // Validate fields
+        if (pocketName.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Pocket Name is required", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (selectedMonth == null) {
+            JOptionPane.showMessageDialog(null, "Month selection is required", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (expenseName.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Expense Name is required", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // For now, just print the values
+        System.out.println("Pocket Name: " + pocketName);
+        System.out.println("Month: " + selectedMonth);
+        System.out.println("Expense Name: " + expenseName);
+        System.out.println("Expense Type: " + expenseType);
+        System.out.println("Date: " + selectedDate);
     }
 
     public static void main(String[] args) {
