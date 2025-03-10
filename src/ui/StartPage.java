@@ -60,7 +60,7 @@ public class StartPage extends JFrame {
         gbc.insets = new Insets(5, 5, 5, 5);
 
         JButton startButton = new JButton("Start My Expense");
-        StartPageStyle.styleButton(startButton);  // Apply styling from your custom method
+        StartPageStyle.styleGreenButton(startButton);  // Apply styling for green button
 
         startButton.addActionListener(new ActionListener() {
             @Override
@@ -71,7 +71,7 @@ public class StartPage extends JFrame {
         });
 
         JButton refreshButton = new JButton("Refresh");
-        StartPageStyle.styleButton(refreshButton);  // Apply styling from your custom method
+        StartPageStyle.styleGreenButton(refreshButton);  // Apply styling for green button
 
         refreshButton.addActionListener(new ActionListener() {
             @Override
@@ -132,7 +132,7 @@ public class StartPage extends JFrame {
 
             // Add expense button
             JButton addExpenseButton = new JButton("Add Expense");
-            StartPageStyle.styleButton(addExpenseButton);  // Apply custom styles to the button
+            StartPageStyle.styleGreenButton(addExpenseButton);  // Apply custom styles to the button
             addExpenseButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -142,7 +142,7 @@ public class StartPage extends JFrame {
 
             // Delete pocket button
             JButton deletePocketButton = new JButton("Delete Pocket");
-            StartPageStyle.styleButton(deletePocketButton);  // Apply custom styles to the button
+            StartPageStyle.styleRedButton(deletePocketButton);  // Apply custom styles to the button
             deletePocketButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -151,7 +151,7 @@ public class StartPage extends JFrame {
                 }
             });
 
-            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
             buttonPanel.add(addExpenseButton);
             buttonPanel.add(deletePocketButton);
             panel.add(buttonPanel, BorderLayout.SOUTH);

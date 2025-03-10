@@ -7,10 +7,19 @@ import java.awt.*;
 
 public class StartPageStyle {
 
-    public static void styleButton(JButton button) {
+    public static void styleGreenButton(JButton button) {
         button.setFont(new Font("Serif", Font.BOLD, 18));
-        button.setBackground(Color.GREEN);
-        button.setForeground(Color.BLACK);
+        button.setBackground(new Color(34, 139, 34)); // Dark green
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setOpaque(true);
+    }
+
+    public static void styleRedButton(JButton button) {
+        button.setFont(new Font("Serif", Font.BOLD, 18));
+        button.setBackground(Color.RED);
+        button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
         button.setBorderPainted(false);
         button.setOpaque(true);
