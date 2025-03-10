@@ -9,7 +9,7 @@ public class ExpenseStyle {
 
     public static void styleButton(JButton button) {
         button.setFont(new Font("SansSerif", Font.BOLD, 16));
-        button.setBackground(new Color(34, 153, 84)); // Darker Green
+        button.setBackground(new Color(34, 139, 34)); // Updated Green color
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
         button.setBorder(BorderFactory.createCompoundBorder(
