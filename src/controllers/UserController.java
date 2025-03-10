@@ -27,18 +27,19 @@ public class UserController {
         try {
             MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
 
-            // Generate JWT token for the user with email and password only
+            // Generate JWT token for the user with email and password
             String token = generateJwtToken(user);
 
-            // Store the user along with the token in MongoDB
-            Document userDoc = new Document("email", user.getEmail())
+            // Store the user along with the token in MongoDB, including the name
+            Document userDoc = new Document("name", user.getName())  // Store the name
+                    .append("email", user.getEmail())
                     .append("password", user.getPassword())
                     .append("token", token);  // Store the generated token
 
             collection.insertOne(userDoc);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();  // You can replace this with a proper logging framework
+            e.printStackTrace();  // Log the exception
             return false;
         }
     }
