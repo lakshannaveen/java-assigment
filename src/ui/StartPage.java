@@ -7,6 +7,9 @@ import models.ExpenseModel;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -84,7 +87,7 @@ public class StartPage extends JFrame {
             String pocketName = entry.getKey();
             List<ExpenseModel> pocketExpenses = entry.getValue();
 
-            String[] columnNames = {"Month", "Expense Name", "Amount", "Date"};
+            String[] columnNames = {"Month", "Expense Name", "Amount", "Date", "Actions"};
             DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
 
             for (ExpenseModel expense : pocketExpenses) {
@@ -92,17 +95,47 @@ public class StartPage extends JFrame {
                         expense.getSelectedMonth(),
                         expense.getExpenseName(),
                         expense.getAmount(),
-                        expense.getDate()
+                        expense.getDate(),
+                        "Delete" // Placeholder for delete button
                 };
                 tableModel.addRow(rowData);
             }
 
             JTable expenseTable = new JTable(tableModel);
+            expenseTable.getColumn("Actions").setCellRenderer(new ButtonRenderer());
+            expenseTable.getColumn("Actions").setCellEditor(new ButtonEditor(new JCheckBox()));
+
             StartPageStyle.styleTable(expenseTable);  // Apply custom styles to the table
 
             JScrollPane scrollPane = new JScrollPane(expenseTable);
             JPanel panel = new JPanel(new BorderLayout());
             panel.add(scrollPane, BorderLayout.CENTER);
+
+            // Add expense button
+            JButton addExpenseButton = new JButton("Add Expense");
+            StartPageStyle.styleButton(addExpenseButton);  // Apply custom styles to the button
+            addExpenseButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    new AddExpense();  // Navigate to AddExpense form
+                }
+            });
+
+            // Delete pocket button
+            JButton deletePocketButton = new JButton("Delete Pocket");
+            StartPageStyle.styleButton(deletePocketButton);  // Apply custom styles to the button
+            deletePocketButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    // Placeholder for delete pocket functionality
+                    JOptionPane.showMessageDialog(panel, "Pocket '" + pocketName + "' deleted.");
+                }
+            });
+
+            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+            buttonPanel.add(addExpenseButton);
+            buttonPanel.add(deletePocketButton);
+            panel.add(buttonPanel, BorderLayout.SOUTH);
 
             tabbedPane.addTab(pocketName, panel);
         }
@@ -123,5 +156,61 @@ public class StartPage extends JFrame {
         // Example JWT (replace with actual JWT generated during registration)
         String exampleToken = "token";  // Pass your generated token here
         new StartPage(exampleToken);
+    }
+
+    // Custom ButtonRenderer class
+    class ButtonRenderer extends JButton implements TableCellRenderer {
+        public ButtonRenderer() {
+            setOpaque(true);
+        }
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                                                       boolean isSelected, boolean hasFocus, int row, int column) {
+            setText((value == null) ? "" : value.toString());
+            return this;
+        }
+    }
+
+    // Custom ButtonEditor class
+    class ButtonEditor extends DefaultCellEditor {
+        private String label;
+        private JButton button;
+        private boolean isPushed;
+
+        public ButtonEditor(JCheckBox checkBox) {
+            super(checkBox);
+            button = new JButton();
+            button.setOpaque(true);
+            button.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    fireEditingStopped();
+                }
+            });
+        }
+
+        public Component getTableCellEditorComponent(JTable table, Object value,
+                                                     boolean isSelected, int row, int column) {
+            label = (value == null) ? "" : value.toString();
+            button.setText(label);
+            isPushed = true;
+            return button;
+        }
+
+        public Object getCellEditorValue() {
+            if (isPushed) {
+                // Placeholder for delete functionality
+                JOptionPane.showMessageDialog(button, label + ": Deleted");
+            }
+            isPushed = false;
+            return label;
+        }
+
+        public boolean stopCellEditing() {
+            isPushed = false;
+            return super.stopCellEditing();
+        }
+
+        protected void fireEditingStopped() {
+            super.fireEditingStopped();
+        }
     }
 }
