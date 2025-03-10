@@ -11,9 +11,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class StartPage extends JFrame {
-    private JTable expenseTable;
     private ExpenseController expenseController;
 
     public StartPage(String token) {
@@ -25,7 +26,7 @@ public class StartPage extends JFrame {
 
         // Set the JFrame properties
         setTitle("Welcome - Expense Tracker");
-        setSize(600, 400);
+        setSize(800, 600); // Adjusted size for better visibility
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -41,13 +42,12 @@ public class StartPage extends JFrame {
 
         mainPanel.add(welcomeLabel, BorderLayout.NORTH);
 
-        // Table to display expenses
-        expenseTable = new JTable();
-        JScrollPane scrollPane = new JScrollPane(expenseTable);
-        mainPanel.add(scrollPane, BorderLayout.CENTER);
+        // Tabbed pane to display expenses by pocket name
+        JTabbedPane tabbedPane = new JTabbedPane();
+        mainPanel.add(tabbedPane, BorderLayout.CENTER);
 
         // Fetch and display expenses
-        loadExpenses(email);
+        loadExpenses(email, tabbedPane);
 
         // Start button to navigate to Expense page
         JButton startButton = new JButton("Start My Expense");
@@ -72,25 +72,40 @@ public class StartPage extends JFrame {
         setVisible(true);
     }
 
-    private void loadExpenses(String email) {
+    private void loadExpenses(String email, JTabbedPane tabbedPane) {
         List<ExpenseModel> expenses = expenseController.getExpensesByEmail(email);
 
-        String[] columnNames = {"Pocket Name", "Month", "Expense Name", "Expense Type", "Date"};
-        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+        // Group expenses by pocket name
+        Map<String, List<ExpenseModel>> expensesByPocketName = expenses.stream()
+                .collect(Collectors.groupingBy(ExpenseModel::getPocketName));
 
-        for (ExpenseModel expense : expenses) {
-            Object[] rowData = {
-                    expense.getPocketName(),
-                    expense.getMonth(),
-                    expense.getExpenseName(),
-                    expense.getExpenseType(),
-                    expense.getDate()
-            };
-            tableModel.addRow(rowData);
+        // Create a table for each pocket name and add it to the tabbed pane
+        for (Map.Entry<String, List<ExpenseModel>> entry : expensesByPocketName.entrySet()) {
+            String pocketName = entry.getKey();
+            List<ExpenseModel> pocketExpenses = entry.getValue();
+
+            String[] columnNames = {"Month", "Expense Name", "Amount", "Date"};
+            DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+
+            for (ExpenseModel expense : pocketExpenses) {
+                Object[] rowData = {
+                        expense.getSelectedMonth(),
+                        expense.getExpenseName(),
+                        expense.getAmount(),
+                        expense.getDate()
+                };
+                tableModel.addRow(rowData);
+            }
+
+            JTable expenseTable = new JTable(tableModel);
+            StartPageStyle.styleTable(expenseTable);  // Apply custom styles to the table
+
+            JScrollPane scrollPane = new JScrollPane(expenseTable);
+            JPanel panel = new JPanel(new BorderLayout());
+            panel.add(scrollPane, BorderLayout.CENTER);
+
+            tabbedPane.addTab(pocketName, panel);
         }
-
-        expenseTable.setModel(tableModel);
-        StartPageStyle.styleTable(expenseTable);  // Apply custom styles to the table
     }
 
     private String getEmailFromToken(String token) {

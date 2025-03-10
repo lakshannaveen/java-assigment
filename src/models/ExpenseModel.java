@@ -4,21 +4,22 @@ import java.util.Date;
 
 public class ExpenseModel {
     private String pocketName;
-    private String month;
+    private String selectedMonth;
     private String expenseName;
-    private String expenseType;
+    private double amount; // Add amount field
     private Date date;
-    private String email; // Add email field
+    private String email;
 
-    public ExpenseModel(String pocketName, String month, String expenseName, String expenseType, Date date, String email) {
+    public ExpenseModel(String pocketName, String selectedMonth, String expenseName, double amount, Date date, String email) {
         this.pocketName = pocketName;
-        this.month = month;
+        this.selectedMonth = selectedMonth;
         this.expenseName = expenseName;
-        this.expenseType = expenseType;
+        this.amount = amount;
         this.date = date;
         this.email = email;
     }
 
+    // Getters and Setters
     public String getPocketName() {
         return pocketName;
     }
@@ -27,12 +28,12 @@ public class ExpenseModel {
         this.pocketName = pocketName;
     }
 
-    public String getMonth() {
-        return month;
+    public String getSelectedMonth() {
+        return selectedMonth;
     }
 
-    public void setMonth(String month) {
-        this.month = month;
+    public void setSelectedMonth(String selectedMonth) {
+        this.selectedMonth = selectedMonth;
     }
 
     public String getExpenseName() {
@@ -43,12 +44,12 @@ public class ExpenseModel {
         this.expenseName = expenseName;
     }
 
-    public String getExpenseType() {
-        return expenseType;
+    public double getAmount() {
+        return amount;
     }
 
-    public void setExpenseType(String expenseType) {
-        this.expenseType = expenseType;
+    public void setAmount(double amount) {
+        this.amount = amount;
     }
 
     public Date getDate() {

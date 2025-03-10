@@ -26,11 +26,11 @@ public class ExpenseController {
         // Create a document representing the expense data
         Document expenseDocument = new Document()
                 .append("pocketName", expense.getPocketName())
-                .append("month", expense.getMonth())
+                .append("selectedMonth", expense.getSelectedMonth()) // Update field name
                 .append("expenseName", expense.getExpenseName())
-                .append("expenseType", expense.getExpenseType())
+                .append("amount", expense.getAmount()) // Add amount field
                 .append("date", expense.getDate())
-                .append("email", expense.getEmail()); // Add email field
+                .append("email", expense.getEmail());
 
         // Insert the document into the collection
         collection.insertOne(expenseDocument);
@@ -49,9 +49,9 @@ public class ExpenseController {
         for (Document document : documents) {
             ExpenseModel expense = new ExpenseModel(
                     document.getString("pocketName"),
-                    document.getString("month"),
+                    document.getString("selectedMonth"),
                     document.getString("expenseName"),
-                    document.getString("expenseType"),
+                    document.getDouble("amount"), // Update field name
                     document.getDate("date"),
                     document.getString("email")
             );

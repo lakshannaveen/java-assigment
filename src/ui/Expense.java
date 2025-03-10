@@ -19,7 +19,7 @@ public class Expense extends JFrame {
     private JSpinner dateSpinner;
     private JTextField pocketNameField;
     private JTextField expenseNameField;
-    private JTextField expenseTypeField;
+    private JTextField amountField; // Add amount field
     private ExpenseController expenseController;
     private String token;
 
@@ -48,7 +48,7 @@ public class Expense extends JFrame {
         backButtonPanel.add(backButton);
         mainPanel.add(backButtonPanel, BorderLayout.NORTH);
 
-        JPanel formPanel = new JPanel(new GridLayout(5, 2, 10, 10));
+        JPanel formPanel = new JPanel(new GridLayout(5, 2, 10, 10)); // Update grid layout to 5 rows
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JLabel pocketNameLabel = new JLabel("Pocket Name:");
@@ -69,11 +69,11 @@ public class Expense extends JFrame {
         formPanel.add(expenseNameLabel);
         formPanel.add(expenseNameField);
 
-        JLabel expenseTypeLabel = new JLabel("Expense Type (optional):");
-        expenseTypeField = new JTextField();
-        ExpenseStyle.addPlaceholder(expenseTypeField, "Enter expense type");
-        formPanel.add(expenseTypeLabel);
-        formPanel.add(expenseTypeField);
+        JLabel amountLabel = new JLabel("Amount (optional):"); // Add amount label
+        amountField = new JTextField();
+        ExpenseStyle.addPlaceholder(amountField, "Enter amount");
+        formPanel.add(amountLabel);
+        formPanel.add(amountField);
 
         JLabel dateLabel = new JLabel("Select Date (optional):");
         dateSpinner = new JSpinner(new SpinnerDateModel());
@@ -134,9 +134,9 @@ public class Expense extends JFrame {
             expenseNameField.setText("");
             expenseNameField.setForeground(Color.BLACK);
         }
-        if (expenseTypeField.getForeground() == Color.GRAY) {
-            expenseTypeField.setText("");
-            expenseTypeField.setForeground(Color.BLACK);
+        if (amountField.getForeground() == Color.GRAY) { // Clear amount placeholder
+            amountField.setText("");
+            amountField.setForeground(Color.BLACK);
         }
     }
 
@@ -155,7 +155,7 @@ public class Expense extends JFrame {
         String pocketName = pocketNameField.getText();
         String selectedMonth = (String) monthComboBox.getSelectedItem();
         String expenseName = expenseNameField.getText();
-        String expenseType = expenseTypeField.getText();
+        String amountText = amountField.getText(); // Get amount text
         Date selectedDate = (Date) dateSpinner.getValue();
         String email = getEmailFromToken(token);
 
@@ -169,7 +169,17 @@ public class Expense extends JFrame {
             return;
         }
 
-        ExpenseModel expense = new ExpenseModel(pocketName, selectedMonth, expenseName, expenseType, selectedDate, email);
+        double amount = 0;
+        if (!amountText.isEmpty()) {
+            try {
+                amount = Double.parseDouble(amountText); // Parse amount
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Invalid amount", "Validation Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
+
+        ExpenseModel expense = new ExpenseModel(pocketName, selectedMonth, expenseName, amount, selectedDate, email);
         expenseController.addExpense(expense);
 
         JOptionPane.showMessageDialog(null, "Expense added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
