@@ -1,5 +1,7 @@
 package ui;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import controllers.ExpenseController;
 import models.ExpenseModel;
 import javax.swing.*;
@@ -19,8 +21,10 @@ public class Expense extends JFrame {
     private JTextField expenseNameField;
     private JTextField expenseTypeField;
     private ExpenseController expenseController;
+    private String token;
 
     public Expense(String token) {
+        this.token = token;
         setTitle("Expense Tracker");
         setSize(400, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -136,12 +140,24 @@ public class Expense extends JFrame {
         }
     }
 
+    private String getEmailFromToken(String token) {
+        try {
+            // Decode JWT token to get the email claim
+            DecodedJWT decodedJWT = JWT.decode(token);
+            return decodedJWT.getClaim("email").asString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;  // Return null if there is any error decoding the token
+        }
+    }
+
     private void validateAndSubmitForm() {
         String pocketName = pocketNameField.getText();
         String selectedMonth = (String) monthComboBox.getSelectedItem();
         String expenseName = expenseNameField.getText();
         String expenseType = expenseTypeField.getText();
         Date selectedDate = (Date) dateSpinner.getValue();
+        String email = getEmailFromToken(token);
 
         if (pocketName.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Pocket Name is required", "Validation Error", JOptionPane.ERROR_MESSAGE);
@@ -153,7 +169,7 @@ public class Expense extends JFrame {
             return;
         }
 
-        ExpenseModel expense = new ExpenseModel(pocketName, selectedMonth, expenseName, expenseType, selectedDate);
+        ExpenseModel expense = new ExpenseModel(pocketName, selectedMonth, expenseName, expenseType, selectedDate, email);
         expenseController.addExpense(expense);
 
         JOptionPane.showMessageDialog(null, "Expense added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);

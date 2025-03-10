@@ -8,13 +8,15 @@ public class ExpenseModel {
     private String expenseName;
     private String expenseType;
     private Date date;
+    private String email; // Add email field
 
-    public ExpenseModel(String pocketName, String month, String expenseName, String expenseType, Date date) {
+    public ExpenseModel(String pocketName, String month, String expenseName, String expenseType, Date date, String email) {
         this.pocketName = pocketName;
         this.month = month;
         this.expenseName = expenseName;
         this.expenseType = expenseType;
         this.date = date;
+        this.email = email;
     }
 
     public String getPocketName() {
@@ -55,5 +57,13 @@ public class ExpenseModel {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

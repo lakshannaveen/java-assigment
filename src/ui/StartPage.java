@@ -2,13 +2,19 @@ package ui;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import controllers.ExpenseController;
+import models.ExpenseModel;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class StartPage extends JFrame {
+    private JTable expenseTable;
+    private ExpenseController expenseController;
 
     public StartPage(String token) {
         // Decode the token to get the email
@@ -19,9 +25,12 @@ public class StartPage extends JFrame {
 
         // Set the JFrame properties
         setTitle("Welcome - Expense Tracker");
-        setSize(400, 300);
+        setSize(600, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+
+        // Initialize the expense controller
+        expenseController = new ExpenseController();
 
         // Main panel setup
         JPanel mainPanel = new JPanel(new BorderLayout());
@@ -31,6 +40,14 @@ public class StartPage extends JFrame {
         welcomeLabel.setFont(new Font("Serif", Font.BOLD, 24));
 
         mainPanel.add(welcomeLabel, BorderLayout.NORTH);
+
+        // Table to display expenses
+        expenseTable = new JTable();
+        JScrollPane scrollPane = new JScrollPane(expenseTable);
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
+
+        // Fetch and display expenses
+        loadExpenses(email);
 
         // Start button to navigate to Expense page
         JButton startButton = new JButton("Start My Expense");
@@ -44,16 +61,36 @@ public class StartPage extends JFrame {
             }
         });
 
-
         // Button panel for layout
         JPanel buttonPanel = new JPanel(new GridBagLayout());
         buttonPanel.add(startButton);
 
-        mainPanel.add(buttonPanel, BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         // Add the main panel to the frame and make it visible
         add(mainPanel);
         setVisible(true);
+    }
+
+    private void loadExpenses(String email) {
+        List<ExpenseModel> expenses = expenseController.getExpensesByEmail(email);
+
+        String[] columnNames = {"Pocket Name", "Month", "Expense Name", "Expense Type", "Date"};
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+
+        for (ExpenseModel expense : expenses) {
+            Object[] rowData = {
+                    expense.getPocketName(),
+                    expense.getMonth(),
+                    expense.getExpenseName(),
+                    expense.getExpenseType(),
+                    expense.getDate()
+            };
+            tableModel.addRow(rowData);
+        }
+
+        expenseTable.setModel(tableModel);
+        StartPageStyle.styleTable(expenseTable);  // Apply custom styles to the table
     }
 
     private String getEmailFromToken(String token) {
