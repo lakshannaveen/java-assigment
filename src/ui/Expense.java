@@ -1,5 +1,7 @@
 package ui;
 
+import controllers.ExpenseController;
+import models.ExpenseModel;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -16,6 +18,7 @@ public class Expense extends JFrame {
     private JTextField pocketNameField;
     private JTextField expenseNameField;
     private JTextField expenseTypeField;
+    private ExpenseController expenseController;
 
     public Expense() {
         setTitle("Expense Tracker");
@@ -23,62 +26,51 @@ public class Expense extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Create the main panel and apply styles
+        expenseController = new ExpenseController();
+
         JPanel mainPanel = new JPanel(new BorderLayout());
 
-        // Create the back button
         JButton backButton = new JButton("Back");
         ExpenseStyle.styleButton(backButton);
-
-        // Add action listener to the back button
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new StartPage();
-                dispose(); // Close the current window
+                dispose();
             }
         });
 
-        // Create a panel for the back button and add the button to it
         JPanel backButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         backButtonPanel.add(backButton);
-
-        // Add the back button panel to the main panel
         mainPanel.add(backButtonPanel, BorderLayout.NORTH);
 
-        // Create form panel
         JPanel formPanel = new JPanel(new GridLayout(5, 2, 10, 10));
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Pocket name
         JLabel pocketNameLabel = new JLabel("Pocket Name:");
         pocketNameField = new JTextField();
         ExpenseStyle.addPlaceholder(pocketNameField, "Enter pocket name");
         formPanel.add(pocketNameLabel);
         formPanel.add(pocketNameField);
 
-        // Select a month (only current month)
         JLabel monthLabel = new JLabel("Select Month:");
         monthComboBox = new JComboBox<>();
         populateMonthComboBox();
         formPanel.add(monthLabel);
         formPanel.add(monthComboBox);
 
-        // Expense name (optional)
         JLabel expenseNameLabel = new JLabel("Expense Name (optional):");
         expenseNameField = new JTextField();
         ExpenseStyle.addPlaceholder(expenseNameField, "Enter expense name");
         formPanel.add(expenseNameLabel);
         formPanel.add(expenseNameField);
 
-        // Expense type (optional)
         JLabel expenseTypeLabel = new JLabel("Expense Type (optional):");
         expenseTypeField = new JTextField();
         ExpenseStyle.addPlaceholder(expenseTypeField, "Enter expense type");
         formPanel.add(expenseTypeLabel);
         formPanel.add(expenseTypeField);
 
-        // Select date within the month (optional)
         JLabel dateLabel = new JLabel("Select Date (optional):");
         dateSpinner = new JSpinner(new SpinnerDateModel());
         JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(dateSpinner, "dd-MM-yyyy");
@@ -87,10 +79,8 @@ public class Expense extends JFrame {
         formPanel.add(dateLabel);
         formPanel.add(dateSpinner);
 
-        // Add form panel to the main panel
         mainPanel.add(formPanel, BorderLayout.CENTER);
 
-        // Submit button
         JButton submitButton = new JButton("Submit");
         ExpenseStyle.styleButton(submitButton);
         submitButton.addActionListener(new ActionListener() {
@@ -101,12 +91,10 @@ public class Expense extends JFrame {
             }
         });
 
-        // Add submit button to the main panel
         JPanel submitButtonPanel = new JPanel();
         submitButtonPanel.add(submitButton);
         mainPanel.add(submitButtonPanel, BorderLayout.SOUTH);
 
-        // Add main panel to the frame
         add(mainPanel);
         setVisible(true);
     }
@@ -116,7 +104,7 @@ public class Expense extends JFrame {
         YearMonth currentYearMonth = YearMonth.of(now.getYear(), now.getMonth());
         monthComboBox.addItem(currentYearMonth.getMonth().name() + " " + currentYearMonth.getYear());
         monthComboBox.setSelectedIndex(0);
-        monthComboBox.setEnabled(false); // Disable to make sure only current month can be selected
+        monthComboBox.setEnabled(false);
     }
 
     private void setDateRange() {
@@ -134,7 +122,6 @@ public class Expense extends JFrame {
     }
 
     private void clearPlaceholders() {
-        // Remove placeholders before validation
         if (pocketNameField.getForeground() == Color.GRAY) {
             pocketNameField.setText("");
             pocketNameField.setForeground(Color.BLACK);
@@ -156,7 +143,6 @@ public class Expense extends JFrame {
         String expenseType = expenseTypeField.getText();
         Date selectedDate = (Date) dateSpinner.getValue();
 
-        // Validate fields
         if (pocketName.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Pocket Name is required", "Validation Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -167,17 +153,10 @@ public class Expense extends JFrame {
             return;
         }
 
-        if (expenseName.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Expense Name is required", "Validation Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+        ExpenseModel expense = new ExpenseModel(pocketName, selectedMonth, expenseName, expenseType, selectedDate);
+        expenseController.addExpense(expense);
 
-        // For now, just print the values
-        System.out.println("Pocket Name: " + pocketName);
-        System.out.println("Month: " + selectedMonth);
-        System.out.println("Expense Name: " + expenseName);
-        System.out.println("Expense Type: " + expenseType);
-        System.out.println("Date: " + selectedDate);
+        JOptionPane.showMessageDialog(null, "Expense added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
     }
 
     public static void main(String[] args) {
