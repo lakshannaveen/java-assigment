@@ -4,6 +4,10 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
+
 import org.bson.Document;
 
 import javax.swing.*;
@@ -11,6 +15,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.regex.Pattern;
+import java.util.Date;
 
 public class LoginPage extends JFrame {
 
@@ -22,6 +27,7 @@ public class LoginPage extends JFrame {
     private static final String CONNECTION_STRING = "mongodb+srv://naveen:uD4DxPM4lBhZ4gOH@cluster0.lbyqk.mongodb.net/test?retryWrites=true&w=majority&appName=Cluster0";
     private static final String DATABASE_NAME = "test";
     private static final String COLLECTION_NAME = "users";
+    private static final String SECRET_KEY = "1020"; // Secret key for JWT
 
     public LoginPage() {
         setTitle("Login - Expense Tracker");
@@ -65,10 +71,13 @@ public class LoginPage extends JFrame {
                     return;
                 }
 
-                if (authenticateUser(email, password)) {
+                String token = authenticateUser(email, password);
+                if (token != null) {
                     JOptionPane.showMessageDialog(null, "Login Successful!");
+
+                    // Pass token to StartPage
                     dispose();
-                    new StartPage();
+                    new StartPage(token); // Pass the token to StartPage constructor
                 } else {
                     JOptionPane.showMessageDialog(null, "Invalid email or password.");
                 }
@@ -79,7 +88,7 @@ public class LoginPage extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
-                new StartPage();
+                new StartPage(""); // You can pass an empty string if no token is available
             }
         });
 
@@ -115,7 +124,7 @@ public class LoginPage extends JFrame {
         setVisible(true);
     }
 
-    private boolean authenticateUser(String email, String password) {
+    private String authenticateUser(String email, String password) {
         try (MongoClient mongoClient = MongoClients.create(CONNECTION_STRING)) {
             MongoDatabase database = mongoClient.getDatabase(DATABASE_NAME);
             MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
@@ -123,10 +132,33 @@ public class LoginPage extends JFrame {
             Document query = new Document("email", email).append("password", password);
             Document user = collection.find(query).first();
 
-            return user != null;
+            if (user != null) {
+                // Generate JWT token after successful authentication
+                return generateJwtToken(email);
+            } else {
+                return null;
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return null;
+        }
+    }
+
+    private String generateJwtToken(String email) {
+        try {
+            long expirationTime = 365 * 24 * 60 * 60 * 1000L; // 1 year in milliseconds
+            Date expirationDate = new Date(System.currentTimeMillis() + expirationTime);
+
+            Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY);
+
+            return JWT.create()
+                    .withSubject(email)
+                    .withClaim("email", email)
+                    .withExpiresAt(expirationDate)
+                    .sign(algorithm);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 

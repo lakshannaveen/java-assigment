@@ -35,7 +35,7 @@ public class Expense extends JFrame {
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new StartPage();
+                new HomePage();
                 dispose();
             }
         });

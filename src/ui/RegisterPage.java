@@ -5,6 +5,9 @@ import java.awt.*;
 import java.util.regex.Pattern;
 import controllers.UserController;
 import models.User;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import java.util.Date;
 
 public class RegisterPage extends JFrame {
 
@@ -75,11 +78,17 @@ public class RegisterPage extends JFrame {
                 return;
             }
 
+            // Create the user object
             User user = new User(name, email, password);
             if (userController.registerUser(user)) {
                 JOptionPane.showMessageDialog(this, "Registration Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 dispose(); // Close the register page
-                new StartPage(); // Redirect to StartPage
+
+                // Generate JWT Token
+                String token = generateJWT(email);
+
+                // Pass the token to the StartPage
+                new StartPage(token); // Use the generated token here
             } else {
                 JOptionPane.showMessageDialog(this, "Registration Failed!", "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -139,6 +148,21 @@ public class RegisterPage extends JFrame {
         String emailRegex = "^[A-Za-z0-9+_.-]+@(.+)$";
         Pattern pattern = Pattern.compile(emailRegex);
         return pattern.matcher(email).matches();
+    }
+
+    private String generateJWT(String email) {
+        try {
+            // Define the JWT signing algorithm
+            Algorithm algorithm = Algorithm.HMAC256("1020"); // Use a secret key for signing
+            String token = JWT.create()
+                    .withClaim("email", email)  // Add email claim to the token
+                    .withExpiresAt(new Date(System.currentTimeMillis() + 3600000)) // Expiration time: 1 hour
+                    .sign(algorithm); // Sign and generate the token
+            return token;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static void main(String[] args) {
