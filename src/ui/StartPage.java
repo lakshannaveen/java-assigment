@@ -14,6 +14,9 @@ public class StartPage extends JFrame {
         // Decode the token to get the email
         String email = getEmailFromToken(token);
 
+        // Extract the username part of the email (before '@')
+        String username = email != null ? email.split("@")[0] : "Guest";
+
         // Set the JFrame properties
         setTitle("Welcome - Expense Tracker");
         setSize(400, 300);
@@ -23,8 +26,8 @@ public class StartPage extends JFrame {
         // Main panel setup
         JPanel mainPanel = new JPanel(new BorderLayout());
 
-        // Welcome label with the email or "Guest" if email is null
-        JLabel welcomeLabel = new JLabel("Welcome to My Expense, " + (email != null ? email : "Guest") + "!", SwingConstants.CENTER);
+        // Welcome label with the username or "Guest" if email is null
+        JLabel welcomeLabel = new JLabel("Welcome to My Expense, " + username + "!", SwingConstants.CENTER);
         welcomeLabel.setFont(new Font("Serif", Font.BOLD, 24));
 
         mainPanel.add(welcomeLabel, BorderLayout.NORTH);
