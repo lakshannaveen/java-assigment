@@ -54,11 +54,12 @@ public class AdminRegister extends JFrame {
         registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String username = usernameField.getText();
-                String password = new String(passwordField.getPassword());
+                String username = usernameField.getText().trim();
+                String password = new String(passwordField.getPassword()).trim();
 
-                if (username.length() < 5) {
-                    JOptionPane.showMessageDialog(null, "Username must be at least 5 characters long.");
+                // Validation rules
+                if (username.length() < 5 || username.length() > 20) {
+                    JOptionPane.showMessageDialog(null, "Username must be between 5 to 20 characters.");
                     return;
                 }
 
