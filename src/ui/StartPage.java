@@ -109,6 +109,7 @@ public class StartPage extends JFrame {
             String[] columnNames = {"Month", "Expense Name", "Amount", "Date", "Actions", "Update"};
             DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
 
+            double totalAmount = 0;
             for (ExpenseModel expense : pocketExpenses) {
                 Object[] rowData = {
                         expense.getSelectedMonth(),
@@ -119,6 +120,7 @@ public class StartPage extends JFrame {
                         "Update"  // Placeholder for update button
                 };
                 tableModel.addRow(rowData);
+                totalAmount += expense.getAmount();
             }
 
             JTable expenseTable = new JTable(tableModel);
@@ -133,6 +135,13 @@ public class StartPage extends JFrame {
             JScrollPane scrollPane = new JScrollPane(expenseTable);
             JPanel panel = new JPanel(new BorderLayout());
             panel.add(scrollPane, BorderLayout.CENTER);
+
+            // Add total amount label at the bottom
+            JLabel totalAmountLabel = new JLabel("Total Amount: " + totalAmount);
+            totalAmountLabel.setFont(new Font("Serif", Font.BOLD, 16));
+            JPanel totalAmountPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+            totalAmountPanel.add(totalAmountLabel);
+            panel.add(totalAmountPanel, BorderLayout.SOUTH);
 
             // Add expense button
             JButton addExpenseButton = new JButton("Add Expense");
@@ -162,7 +171,7 @@ public class StartPage extends JFrame {
             JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
             buttonPanel.add(addExpenseButton);
             buttonPanel.add(deletePocketButton);
-            panel.add(buttonPanel, BorderLayout.SOUTH);
+            panel.add(buttonPanel, BorderLayout.NORTH);
 
             tabbedPane.addTab(pocketName, panel);
         }
