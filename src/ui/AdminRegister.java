@@ -11,7 +11,7 @@ public class AdminRegister extends JFrame {
 
     private JTextField usernameField;
     private JPasswordField passwordField;
-    private JButton registerButton;
+    private JButton registerButton, backButton;
     private AdminController adminController;
 
     public AdminRegister() {
@@ -19,9 +19,11 @@ public class AdminRegister extends JFrame {
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
 
         adminController = new AdminController(); // Initialize controller
 
+        // Create main panel
         JPanel mainPanel = new JPanel(new BorderLayout());
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBorder(BorderFactory.createTitledBorder("Admin Register"));
@@ -35,6 +37,19 @@ public class AdminRegister extends JFrame {
         JLabel passwordLabel = new JLabel("Password:");
         passwordField = new JPasswordField(20);
         registerButton = new JButton("Register");
+        backButton = new JButton("← Back");
+
+        // Apply styles
+        AdminRegisterStyle.applyStyles(registerButton, backButton);
+
+        // Back button action listener
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose(); // Close the register window
+                new AdminLogin(); // Open AdminLogin window
+            }
+        });
 
         registerButton.addActionListener(new ActionListener() {
             @Override
@@ -63,6 +78,11 @@ public class AdminRegister extends JFrame {
             }
         });
 
+        // Back button at the top-left
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        topPanel.add(backButton);
+
+        // Form layout
         gbc.gridx = 0;
         gbc.gridy = 0;
         formPanel.add(usernameLabel, gbc);
@@ -85,7 +105,10 @@ public class AdminRegister extends JFrame {
         gbc.anchor = GridBagConstraints.CENTER;
         formPanel.add(registerButton, gbc);
 
+        // Add panels to frame
+        mainPanel.add(topPanel, BorderLayout.NORTH);
         mainPanel.add(formPanel, BorderLayout.CENTER);
+
         add(mainPanel);
         setVisible(true);
     }
