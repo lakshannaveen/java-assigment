@@ -146,9 +146,12 @@ public class StartPage extends JFrame {
             deletePocketButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    expenseController.deletePocket(email, pocketName);
-                    loadExpenses(email);  // Reload expenses to update UI
-                    JOptionPane.showMessageDialog(panel, "Pocket '" + pocketName + "' deleted successfully.");
+                    int response = JOptionPane.showConfirmDialog(panel, "Are you sure you want to delete pocket '" + pocketName + "'?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    if (response == JOptionPane.YES_OPTION) {
+                        expenseController.deletePocket(email, pocketName);
+                        loadExpenses(email);  // Reload expenses to update UI
+                        JOptionPane.showMessageDialog(panel, "Pocket '" + pocketName + "' deleted successfully.");
+                    }
                 }
             });
 
@@ -182,6 +185,7 @@ public class StartPage extends JFrame {
     class ButtonRenderer extends JButton implements TableCellRenderer {
         public ButtonRenderer() {
             setOpaque(true);
+            StartPageStyle.styleRedButton(this);  // Apply red button style
         }
         public Component getTableCellRendererComponent(JTable table, Object value,
                                                        boolean isSelected, boolean hasFocus, int row, int column) {
@@ -206,6 +210,7 @@ public class StartPage extends JFrame {
             this.pocketName = pocketName;
             button = new JButton();
             button.setOpaque(true);
+            StartPageStyle.styleRedButton(button);  // Apply red button style
             button.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     fireEditingStopped();
@@ -223,11 +228,14 @@ public class StartPage extends JFrame {
 
         public Object getCellEditorValue() {
             if (isPushed) {
-                String selectedMonth = table.getValueAt(table.getSelectedRow(), 0).toString();
-                String expenseName = table.getValueAt(table.getSelectedRow(), 1).toString();
-                expenseController.deleteExpense(email, expenseName, selectedMonth);
-                ((DefaultTableModel) table.getModel()).removeRow(table.getSelectedRow());
-                JOptionPane.showMessageDialog(button, "Expense deleted successfully!");
+                int response = JOptionPane.showConfirmDialog(button, "Are you sure you want to delete this expense?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                if (response == JOptionPane.YES_OPTION) {
+                    String selectedMonth = table.getValueAt(table.getSelectedRow(), 0).toString();
+                    String expenseName = table.getValueAt(table.getSelectedRow(), 1).toString();
+                    expenseController.deleteExpense(email, expenseName, selectedMonth);
+                    ((DefaultTableModel) table.getModel()).removeRow(table.getSelectedRow());
+                    JOptionPane.showMessageDialog(button, "Expense deleted successfully!");
+                }
             }
             isPushed = false;
             return label;
