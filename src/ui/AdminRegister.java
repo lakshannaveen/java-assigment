@@ -1,5 +1,7 @@
 package ui;
 
+import controllers.AdminController;
+import models.AdminModel;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -10,6 +12,7 @@ public class AdminRegister extends JFrame {
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JButton registerButton;
+    private AdminController adminController;
 
     public AdminRegister() {
         setTitle("Admin Register");
@@ -17,7 +20,8 @@ public class AdminRegister extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Create main panel and form panel
+        adminController = new AdminController(); // Initialize controller
+
         JPanel mainPanel = new JPanel(new BorderLayout());
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBorder(BorderFactory.createTitledBorder("Admin Register"));
@@ -26,24 +30,18 @@ public class AdminRegister extends JFrame {
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Create and add labels and fields
         JLabel usernameLabel = new JLabel("Username:");
         usernameField = new JTextField(20);
         JLabel passwordLabel = new JLabel("Password:");
         passwordField = new JPasswordField(20);
         registerButton = new JButton("Register");
 
-        // Apply styles using AdminStyles
-        AdminStyles.applyStyles(formPanel, usernameField, passwordField, registerButton);
-
-        // Add action listener to the register button
         registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String username = usernameField.getText();
                 String password = new String(passwordField.getPassword());
 
-                // Validate username and password
                 if (username.length() < 5) {
                     JOptionPane.showMessageDialog(null, "Username must be at least 5 characters long.");
                     return;
@@ -54,12 +52,17 @@ public class AdminRegister extends JFrame {
                     return;
                 }
 
-                JOptionPane.showMessageDialog(null, "Registration Successful!");
-                // After successful registration, you can proceed to the next page or action.
+                AdminModel newAdmin = new AdminModel(username, password);
+                boolean success = adminController.registerAdmin(newAdmin);
+
+                if (success) {
+                    JOptionPane.showMessageDialog(null, "Registration Successful!");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Username already exists. Try another.");
+                }
             }
         });
 
-        // Add components to the form panel
         gbc.gridx = 0;
         gbc.gridy = 0;
         formPanel.add(usernameLabel, gbc);
@@ -82,20 +85,12 @@ public class AdminRegister extends JFrame {
         gbc.anchor = GridBagConstraints.CENTER;
         formPanel.add(registerButton, gbc);
 
-        // Add form panel to main panel
         mainPanel.add(formPanel, BorderLayout.CENTER);
-
-        // Add main panel to the frame
         add(mainPanel);
         setVisible(true);
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new AdminRegister();
-            }
-        });
+        SwingUtilities.invokeLater(() -> new AdminRegister());
     }
 }
