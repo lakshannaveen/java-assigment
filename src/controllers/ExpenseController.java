@@ -3,6 +3,7 @@ package controllers;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 import database.MongoDBConnection;
 import models.ExpenseModel;
 import org.bson.Document;
@@ -60,6 +61,7 @@ public class ExpenseController {
 
         return expenses;
     }
+
     public void deleteExpense(String email, String expenseName, String selectedMonth) {
         MongoCollection<Document> collection = database.getCollection("expenses");
         collection.deleteOne(Filters.and(
@@ -77,5 +79,19 @@ public class ExpenseController {
                 Filters.eq("pocketName", pocketName)
         ));
         System.out.println("Pocket deleted successfully!");
+    }
+
+    public void updateExpense(ExpenseModel expense) {
+        MongoCollection<Document> collection = database.getCollection("expenses");
+        collection.updateOne(Filters.and(
+                Filters.eq("email", expense.getEmail()),
+                Filters.eq("pocketName", expense.getPocketName()),
+                Filters.eq("selectedMonth", expense.getSelectedMonth()),
+                Filters.eq("expenseName", expense.getExpenseName())
+        ), Updates.combine(
+                Updates.set("expenseName", expense.getExpenseName()),
+                Updates.set("amount", expense.getAmount())
+        ));
+        System.out.println("Expense updated successfully!");
     }
 }

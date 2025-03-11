@@ -25,6 +25,15 @@ public class StartPageStyle {
         button.setOpaque(true);
     }
 
+    public static void styleBlueButton(JButton button) {
+        button.setFont(new Font("Serif", Font.BOLD, 18));
+        button.setBackground(Color.BLUE);
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setOpaque(true);
+    }
+
     public static void styleTable(JTable table) {
         table.setFont(new Font("SansSerif", Font.PLAIN, 14));
         table.setRowHeight(25);

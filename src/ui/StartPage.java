@@ -106,7 +106,7 @@ public class StartPage extends JFrame {
             String pocketName = entry.getKey();
             List<ExpenseModel> pocketExpenses = entry.getValue();
 
-            String[] columnNames = {"Month", "Expense Name", "Amount", "Date", "Actions"};
+            String[] columnNames = {"Month", "Expense Name", "Amount", "Date", "Actions", "Update"};
             DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
 
             for (ExpenseModel expense : pocketExpenses) {
@@ -115,14 +115,18 @@ public class StartPage extends JFrame {
                         expense.getExpenseName(),
                         expense.getAmount(),
                         expense.getDate(),
-                        "Delete" // Placeholder for delete button
+                        "Delete", // Placeholder for delete button
+                        "Update"  // Placeholder for update button
                 };
                 tableModel.addRow(rowData);
             }
 
             JTable expenseTable = new JTable(tableModel);
+            expenseTable.setDefaultEditor(Object.class, new DefaultCellEditor(new JTextField()));
             expenseTable.getColumn("Actions").setCellRenderer(new ButtonRenderer());
-            expenseTable.getColumn("Actions").setCellEditor(new ButtonEditor(new JCheckBox(), expenseTable, email, pocketName));
+            expenseTable.getColumn("Actions").setCellEditor(new ButtonEditor(new JCheckBox(), expenseTable, email, pocketName, false));
+            expenseTable.getColumn("Update").setCellRenderer(new ButtonRenderer());
+            expenseTable.getColumn("Update").setCellEditor(new ButtonEditor(new JCheckBox(), expenseTable, email, pocketName, true));
 
             StartPageStyle.styleTable(expenseTable);  // Apply custom styles to the table
 
@@ -185,11 +189,15 @@ public class StartPage extends JFrame {
     class ButtonRenderer extends JButton implements TableCellRenderer {
         public ButtonRenderer() {
             setOpaque(true);
-            StartPageStyle.styleRedButton(this);  // Apply red button style
         }
         public Component getTableCellRendererComponent(JTable table, Object value,
                                                        boolean isSelected, boolean hasFocus, int row, int column) {
             setText((value == null) ? "" : value.toString());
+            if (value != null && value.toString().equals("Update")) {
+                StartPageStyle.styleBlueButton(this);  // Apply blue button style for update
+            } else if (value != null && value.toString().equals("Delete")) {
+                StartPageStyle.styleRedButton(this);  // Apply red button style for delete
+            }
             return this;
         }
     }
@@ -202,15 +210,21 @@ public class StartPage extends JFrame {
         private JTable table;
         private String email;
         private String pocketName;
+        private boolean isUpdate;
 
-        public ButtonEditor(JCheckBox checkBox, JTable table, String email, String pocketName) {
+        public ButtonEditor(JCheckBox checkBox, JTable table, String email, String pocketName, boolean isUpdate) {
             super(checkBox);
             this.table = table;
             this.email = email;
             this.pocketName = pocketName;
+            this.isUpdate = isUpdate;
             button = new JButton();
             button.setOpaque(true);
-            StartPageStyle.styleRedButton(button);  // Apply red button style
+            if (isUpdate) {
+                StartPageStyle.styleBlueButton(button);  // Apply blue button style for update
+            } else {
+                StartPageStyle.styleRedButton(button);  // Apply red button style for delete
+            }
             button.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     fireEditingStopped();
@@ -228,13 +242,27 @@ public class StartPage extends JFrame {
 
         public Object getCellEditorValue() {
             if (isPushed) {
-                int response = JOptionPane.showConfirmDialog(button, "Are you sure you want to delete this expense?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-                if (response == JOptionPane.YES_OPTION) {
-                    String selectedMonth = table.getValueAt(table.getSelectedRow(), 0).toString();
-                    String expenseName = table.getValueAt(table.getSelectedRow(), 1).toString();
-                    expenseController.deleteExpense(email, expenseName, selectedMonth);
-                    ((DefaultTableModel) table.getModel()).removeRow(table.getSelectedRow());
-                    JOptionPane.showMessageDialog(button, "Expense deleted successfully!");
+                if (isUpdate) {
+                    // Handle update functionality
+                    int selectedRow = table.getSelectedRow();
+                    String selectedMonth = table.getValueAt(selectedRow, 0).toString();
+                    String expenseName = table.getValueAt(selectedRow, 1).toString();
+                    double amount = Double.parseDouble(table.getValueAt(selectedRow, 2).toString());
+
+                    ExpenseModel updatedExpense = new ExpenseModel(pocketName, selectedMonth, expenseName, amount, new java.util.Date(), email);
+                    expenseController.updateExpense(updatedExpense);
+                    JOptionPane.showMessageDialog(button, "Expense updated successfully!");
+                } else {
+                    // Handle delete functionality
+                    int response = JOptionPane.showConfirmDialog(button, "Are you sure you want to delete this expense?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    if (response == JOptionPane.YES_OPTION) {
+                        int selectedRow = table.getSelectedRow();
+                        String selectedMonth = table.getValueAt(selectedRow, 0).toString();
+                        String expenseName = table.getValueAt(selectedRow, 1).toString();
+                        expenseController.deleteExpense(email, expenseName, selectedMonth);
+                        ((DefaultTableModel) table.getModel()).removeRow(table.getSelectedRow());
+                        JOptionPane.showMessageDialog(button, "Expense deleted successfully!");
+                    }
                 }
             }
             isPushed = false;
