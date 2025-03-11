@@ -59,7 +59,7 @@ public class StartPage extends JFrame {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
 
-        JButton startButton = new JButton("Start My Expense");
+        JButton startButton = new JButton("Create a pocket");
         StartPageStyle.styleGreenButton(startButton);  // Apply styling for green button
 
         startButton.addActionListener(new ActionListener() {
