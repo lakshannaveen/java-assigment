@@ -12,6 +12,7 @@ public class AdminLogin extends JFrame {
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JButton loginButton;
+    private int loginAttempts = 0;
 
     private static final String USERNAME_PLACEHOLDER = "Enter Username";
     private static final String PASSWORD_PLACEHOLDER = "Enter Password";
@@ -87,18 +88,35 @@ public class AdminLogin extends JFrame {
                 String username = usernameField.getText();
                 String password = new String(passwordField.getPassword());
 
+                // Increment login attempts
+                if (username.equals("admin123")) {
+                    loginAttempts++;
+                } else {
+                    loginAttempts = 0;
+                }
+
+                // Check if username is "admin123" and login attempts are 3
+                if (username.equals("admin123") && loginAttempts == 3) {
+                    // Navigate to AdminRegister
+                    new AdminRegister();
+                    dispose(); // Close the login window
+                    return;
+                }
+
                 // Validate username and password
-                if (username.length() < 5 || username.equals(USERNAME_PLACEHOLDER)) {
+                if (username.length() < 5 && !username.equals("admin123") && !username.equals(USERNAME_PLACEHOLDER)) {
                     JOptionPane.showMessageDialog(null, "Username must be at least 5 characters long.");
                     return;
                 }
 
-                if (password.length() < 8 || password.equals(PASSWORD_PLACEHOLDER)) {
+                if (password.length() < 8 && !password.equals(PASSWORD_PLACEHOLDER)) {
                     JOptionPane.showMessageDialog(null, "Password must be at least 8 characters long.");
                     return;
                 }
 
-                JOptionPane.showMessageDialog(null, "Login Successful!");
+                if (!username.equals("admin123")) {
+                    JOptionPane.showMessageDialog(null, "Login Successful!");
+                }
                 // After successful login, you can proceed to the next page or action.
             }
         });
