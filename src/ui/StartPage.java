@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import controllers.ExpenseController;
 import models.ExpenseModel;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -20,6 +21,8 @@ public class StartPage extends JFrame {
     private ExpenseController expenseController;
     private String token;
     private JTabbedPane tabbedPane;
+    private JTextField searchField;
+    private JButton searchButton;
 
     public StartPage(String token) {
         this.token = token; // Store the token
@@ -44,7 +47,6 @@ public class StartPage extends JFrame {
         // Welcome label with the username or "Guest" if email is null
         JLabel welcomeLabel = new JLabel("Welcome to My Expense, " + username + "!", SwingConstants.CENTER);
         welcomeLabel.setFont(new Font("Serif", Font.BOLD, 24));
-
         mainPanel.add(welcomeLabel, BorderLayout.NORTH);
 
         // Tabbed pane to display expenses by pocket name
@@ -85,6 +87,23 @@ public class StartPage extends JFrame {
         gbc.gridx = 1;
         buttonPanel.add(refreshButton, gbc);
 
+        // Search field and button
+        searchField = new JTextField(20);
+        searchButton = new JButton("Search");
+        StartPageStyle.styleBlueButton(searchButton);  // Apply styling for blue button
+
+        searchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                searchExpenses(email, searchField.getText().trim());
+            }
+        });
+
+        gbc.gridx = 2;
+        buttonPanel.add(searchField, gbc);
+        gbc.gridx = 3;
+        buttonPanel.add(searchButton, gbc);
+
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         // Add the main panel to the frame and make it visible
@@ -99,6 +118,105 @@ public class StartPage extends JFrame {
 
         // Group expenses by pocket name
         Map<String, List<ExpenseModel>> expensesByPocketName = expenses.stream()
+                .collect(Collectors.groupingBy(ExpenseModel::getPocketName));
+
+        // Create a table for each pocket name and add it to the tabbed pane
+        for (Map.Entry<String, List<ExpenseModel>> entry : expensesByPocketName.entrySet()) {
+            String pocketName = entry.getKey();
+            List<ExpenseModel> pocketExpenses = entry.getValue();
+
+            String[] columnNames = {"Month", "Expense Name", "Amount", "Date", "Actions", "Update"};
+            DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+
+            double totalAmount = 0;
+            for (ExpenseModel expense : pocketExpenses) {
+                Object[] rowData = {
+                        expense.getSelectedMonth(),
+                        expense.getExpenseName(),
+                        expense.getAmount(),
+                        expense.getDate(),
+                        "Delete", // Placeholder for delete button
+                        "Update"  // Placeholder for update button
+                };
+                tableModel.addRow(rowData);
+                totalAmount += expense.getAmount();
+            }
+
+            JTable expenseTable = new JTable(tableModel);
+            expenseTable.setDefaultEditor(Object.class, new DefaultCellEditor(new JTextField()));
+            expenseTable.getColumn("Actions").setCellRenderer(new ButtonRenderer());
+            expenseTable.getColumn("Actions").setCellEditor(new ButtonEditor(new JCheckBox(), expenseTable, email, pocketName, false));
+            expenseTable.getColumn("Update").setCellRenderer(new ButtonRenderer());
+            expenseTable.getColumn("Update").setCellEditor(new ButtonEditor(new JCheckBox(), expenseTable, email, pocketName, true));
+
+            StartPageStyle.styleTable(expenseTable);  // Apply custom styles to the table
+
+            JScrollPane scrollPane = new JScrollPane(expenseTable);
+            JPanel panel = new JPanel(new BorderLayout());
+            panel.add(scrollPane, BorderLayout.CENTER);
+
+            // Add total amount label at the bottom
+            JLabel totalAmountLabel = new JLabel("Total Amount: " + totalAmount);
+            totalAmountLabel.setFont(new Font("Serif", Font.BOLD, 16));
+            JPanel totalAmountPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+            totalAmountPanel.add(totalAmountLabel);
+            panel.add(totalAmountPanel, BorderLayout.SOUTH);
+
+            // Add expense button
+            JButton addExpenseButton = new JButton("Add Expense");
+            StartPageStyle.styleGreenButton(addExpenseButton);  // Apply custom styles to the button
+            addExpenseButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    new AddExpense(token, pocketName);  // Navigate to AddExpense form with token and pocketName
+                }
+            });
+
+            // Delete pocket button
+            JButton deletePocketButton = new JButton("Delete Pocket");
+            StartPageStyle.styleRedButton(deletePocketButton);  // Apply custom styles to the button
+            deletePocketButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    int response = JOptionPane.showConfirmDialog(panel, "Are you sure you want to delete pocket '" + pocketName + "'?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    if (response == JOptionPane.YES_OPTION) {
+                        expenseController.deletePocket(email, pocketName);
+                        loadExpenses(email);  // Reload expenses to update UI
+                        JOptionPane.showMessageDialog(panel, "Pocket '" + pocketName + "' deleted successfully.");
+                    }
+                }
+            });
+
+            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+            buttonPanel.add(addExpenseButton);
+            buttonPanel.add(deletePocketButton);
+            panel.add(buttonPanel, BorderLayout.NORTH);
+
+            tabbedPane.addTab(pocketName, panel);
+        }
+    }
+
+    private void searchExpenses(String email, String searchTerm) {
+        tabbedPane.removeAll();  // Clear existing tabs
+
+        List<ExpenseModel> expenses = expenseController.getExpensesByEmail(email);
+
+        // Filter expenses by the search term using fuzzy matching
+        LevenshteinDistance levenshtein = new LevenshteinDistance();
+        List<ExpenseModel> filteredExpenses = expenses.stream()
+                .filter(expense -> levenshtein.apply(expense.getExpenseName().toLowerCase(), searchTerm.toLowerCase()) <= 3)
+                .collect(Collectors.toList());
+
+        if (filteredExpenses.isEmpty()) {
+            // Show a message if no expenses are found
+            JLabel noExpensesLabel = new JLabel("No expenses found", SwingConstants.CENTER);
+            noExpensesLabel.setFont(new Font("Serif", Font.BOLD, 24));
+            tabbedPane.addTab("Search Results", noExpensesLabel);
+            return;
+        }
+
+        // Group filtered expenses by pocket name
+        Map<String, List<ExpenseModel>> expensesByPocketName = filteredExpenses.stream()
                 .collect(Collectors.groupingBy(ExpenseModel::getPocketName));
 
         // Create a table for each pocket name and add it to the tabbed pane
