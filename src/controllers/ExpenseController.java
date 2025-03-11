@@ -60,4 +60,22 @@ public class ExpenseController {
 
         return expenses;
     }
+    public void deleteExpense(String email, String expenseName, String selectedMonth) {
+        MongoCollection<Document> collection = database.getCollection("expenses");
+        collection.deleteOne(Filters.and(
+                Filters.eq("email", email),
+                Filters.eq("expenseName", expenseName),
+                Filters.eq("selectedMonth", selectedMonth)
+        ));
+        System.out.println("Expense deleted successfully!");
+    }
+
+    public void deletePocket(String email, String pocketName) {
+        MongoCollection<Document> collection = database.getCollection("expenses");
+        collection.deleteMany(Filters.and(
+                Filters.eq("email", email),
+                Filters.eq("pocketName", pocketName)
+        ));
+        System.out.println("Pocket deleted successfully!");
+    }
 }
