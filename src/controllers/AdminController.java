@@ -35,4 +35,19 @@ public class AdminController {
             return false;
         }
     }
+
+    public AdminModel loginAdmin(String username, String password) {
+        try {
+            MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
+
+            // Find admin with matching username and password
+            Document adminDoc = collection.find(new Document("username", username).append("password", password)).first();
+            if (adminDoc != null) {
+                return new AdminModel(adminDoc.getString("username"), adminDoc.getString("password"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

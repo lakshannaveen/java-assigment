@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import controllers.AdminController;
+import models.AdminModel;
 
 public class AdminLogin extends JFrame {
 
@@ -114,10 +116,17 @@ public class AdminLogin extends JFrame {
                     return;
                 }
 
-                if (!username.equals("admin123")) {
+                AdminController adminController = new AdminController();
+                AdminModel admin = adminController.loginAdmin(username, password);
+
+                if (admin != null) {
                     JOptionPane.showMessageDialog(null, "Login Successful!");
+                    // Navigate to AdminDashboard
+                    new AdminDashboard();
+                    dispose(); // Close the login window
+                } else {
+                    JOptionPane.showMessageDialog(null, "Invalid username or password.");
                 }
-                // After successful login, you can proceed to the next page or action.
             }
         });
 
