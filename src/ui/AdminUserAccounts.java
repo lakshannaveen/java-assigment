@@ -46,11 +46,6 @@ public class AdminUserAccounts extends JFrame {
             tableModel.addRow(rowData);
         }
 
-        // Display total number of accounts
-        JLabel totalAccountsLabel = new JLabel("Total Accounts: " + users.size(), SwingConstants.CENTER);
-        AdminUserAccountsStyle.applyStyle(totalAccountsLabel);
-        add(totalAccountsLabel, BorderLayout.SOUTH);
-
         // Back button to return to AdminDashboard
         JButton backButton = new JButton("Back");
         AdminUserAccountsStyle.applyStyle(backButton);
