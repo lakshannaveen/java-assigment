@@ -50,7 +50,7 @@ public class AddExpense extends JFrame {
         backButtonPanel.add(backButton);
         mainPanel.add(backButtonPanel, BorderLayout.NORTH);
 
-        JPanel formPanel = new JPanel(new GridLayout(4, 2, 10, 10)); // Update grid layout to 4 rows
+        JPanel formPanel = new JPanel(new GridLayout(4, 2, 10, 10));
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JLabel monthLabel = new JLabel("Select Month:");
@@ -118,7 +118,13 @@ public class AddExpense extends JFrame {
         Date endDate = calendar.getTime();
         ((SpinnerDateModel) dateSpinner.getModel()).setStart(startDate);
         ((SpinnerDateModel) dateSpinner.getModel()).setEnd(endDate);
-        dateSpinner.setValue(startDate);
+
+        // Set current date, if within the range of the selected month
+        if (now.getDayOfMonth() >= 1 && now.getDayOfMonth() <= calendar.getActualMaximum(Calendar.DAY_OF_MONTH)) {
+            dateSpinner.setValue(Date.from(now.atStartOfDay(calendar.getTimeZone().toZoneId()).toInstant()));
+        } else {
+            dateSpinner.setValue(startDate);
+        }
     }
 
     private void clearPlaceholders() {
@@ -134,19 +140,18 @@ public class AddExpense extends JFrame {
 
     private String getEmailFromToken(String token) {
         try {
-            // Decode JWT token to get the email claim
             DecodedJWT decodedJWT = JWT.decode(token);
             return decodedJWT.getClaim("email").asString();
         } catch (Exception e) {
             e.printStackTrace();
-            return null;  // Return null if there is any error decoding the token
+            return null;
         }
     }
 
     private void validateAndSubmitForm() {
         String selectedMonth = (String) monthComboBox.getSelectedItem();
         String expenseName = expenseNameField.getText();
-        String amountText = amountField.getText(); // Get amount text
+        String amountText = amountField.getText();
         Date selectedDate = (Date) dateSpinner.getValue();
         String email = getEmailFromToken(token);
 
@@ -167,7 +172,7 @@ public class AddExpense extends JFrame {
 
         double amount = 0;
         try {
-            amount = Double.parseDouble(amountText); // Parse amount
+            amount = Double.parseDouble(amountText);
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "Invalid amount", "Validation Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -183,7 +188,7 @@ public class AddExpense extends JFrame {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new AddExpense("token", "DefaultPocketName"); // Replace with actual token logic and pocket name
+                new AddExpense("token", "DefaultPocketName");
             }
         });
     }
