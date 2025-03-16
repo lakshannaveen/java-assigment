@@ -73,6 +73,10 @@ public class AdminRegister extends JFrame {
 
                 if (success) {
                     JOptionPane.showMessageDialog(null, "Registration Successful!");
+
+                    // Log the registration event
+                    Logger.logRegister(username, "admin");
+
                 } else {
                     JOptionPane.showMessageDialog(null, "Username already exists. Try another.");
                 }

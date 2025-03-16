@@ -1,3 +1,8 @@
 
-UserType: user, Username: old@gmail.com, Login Time: 2025-03-16 17:08:39
-UserType: admin, Username: naveen, Login Time: 2025-03-16 17:09:17
+Event: Register, UserType: user, Username: naveen@gmail.com, Time: 2025-03-16 17:19:00
+Event: Login, UserType: user, Username: naveen@gmail.com, Time: 2025-03-16 17:19:37
+Event: Login, UserType: user, Username: old@gmail.com, Time: 2025-03-16 17:20:18
+Event: Login, UserType: admin, Username: naveen, Time: 2025-03-16 17:21:01
+Event: Login, UserType: admin, Username: admin123, Time: 2025-03-16 17:21:33
+Event: Register, UserType: admin, Username: olddesilva, Time: 2025-03-16 17:21:54
+Event: Login, UserType: admin, Username: olddesilva, Time: 2025-03-16 17:22:09

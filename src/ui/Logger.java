@@ -13,7 +13,17 @@ public class Logger {
         try (FileWriter writer = new FileWriter(LOG_FILE_PATH, true)) {
             LocalDateTime now = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            writer.write("UserType: " + userType + ", Username: " + username + ", Login Time: " + now.format(formatter) + "\n");
+            writer.write("Event: Login, UserType: " + userType + ", Username: " + username + ", Time: " + now.format(formatter) + "\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void logRegister(String username, String userType) {
+        try (FileWriter writer = new FileWriter(LOG_FILE_PATH, true)) {
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            writer.write("Event: Register, UserType: " + userType + ", Username: " + username + ", Time: " + now.format(formatter) + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -82,6 +82,10 @@ public class RegisterPage extends JFrame {
             User user = new User(name, email, password);
             if (userController.registerUser(user)) {
                 JOptionPane.showMessageDialog(this, "Registration Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+                // Log the registration event
+                Logger.logRegister(email, "user");
+
                 dispose(); // Close the register page
 
                 // Generate JWT Token
