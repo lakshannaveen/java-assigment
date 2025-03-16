@@ -1,2 +1,3 @@
-User: old@gmail.com, Login Time: 2025-03-16 17:05:23
-User: naveen, Login Time: 2025-03-16 17:06:11
+
+UserType: user, Username: old@gmail.com, Login Time: 2025-03-16 17:08:39
+UserType: admin, Username: naveen, Login Time: 2025-03-16 17:09:17

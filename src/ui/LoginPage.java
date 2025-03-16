@@ -88,7 +88,7 @@ public class LoginPage extends JFrame {
                         JOptionPane.showMessageDialog(null, "Login Successful!");
 
                         // Log the login information
-                        Logger.logLogin(email);
+                        Logger.logLogin(email, "user");
 
                         // Pass token to StartPage
                         dispose();
