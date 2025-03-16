@@ -1,6 +1,7 @@
 package ui;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,15 +15,20 @@ public class AdminDashboard extends JFrame {
 
     public AdminDashboard() {
         setTitle("Admin Dashboard");
-        setSize(400, 300);
+        setSize(600, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
 
         JLabel welcomeLabel = new JLabel("Welcome to Admin Dashboard", SwingConstants.CENTER);
+        AdminDashboardStyle.applyStyle(welcomeLabel);
         add(welcomeLabel, BorderLayout.NORTH);
 
         JButton showLogsButton = new JButton("Show Logs");
-        add(showLogsButton, BorderLayout.SOUTH);
+        AdminDashboardStyle.applyStyle(showLogsButton);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(showLogsButton);
+        add(buttonPanel, BorderLayout.CENTER);
 
         showLogsButton.addActionListener(new ActionListener() {
             @Override
@@ -31,22 +37,51 @@ public class AdminDashboard extends JFrame {
             }
         });
 
+        AdminDashboardStyle.applyStyle(this);
         setVisible(true);
     }
 
     private void showLogs() {
-        JTextArea textArea = new JTextArea(20, 40);
-        textArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(textArea);
+        String[] columnNames = {"Event", "UserType", "Username", "Time"};
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make the table read-only
+            }
+        };
+        JTable table = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(table);
 
         try (BufferedReader reader = new BufferedReader(new FileReader(LOG_FILE_PATH))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                textArea.append(line + "\n");
+                String[] logParts = line.split(", ");
+                String[] rowData = new String[4];
+                for (String part : logParts) {
+                    String[] keyValue = part.split(": ");
+                    if (keyValue.length == 2) {
+                        switch (keyValue[0]) {
+                            case "Event":
+                                rowData[0] = keyValue[1];
+                                break;
+                            case "UserType":
+                                rowData[1] = keyValue[1];
+                                break;
+                            case "Username":
+                                rowData[2] = keyValue[1];
+                                break;
+                            case "Time":
+                                rowData[3] = keyValue[1];
+                                break;
+                        }
+                    }
+                }
+                tableModel.addRow(rowData);
             }
         } catch (IOException e) {
             e.printStackTrace();
-            textArea.setText("Failed to load logs.");
+            JOptionPane.showMessageDialog(this, "Failed to load logs.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
 
         JOptionPane.showMessageDialog(this, scrollPane, "Log Contents", JOptionPane.INFORMATION_MESSAGE);
