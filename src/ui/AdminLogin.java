@@ -99,6 +99,9 @@ public class AdminLogin extends JFrame {
 
                 // Check if username is "admin123" and login attempts are 3
                 if (username.equals("admin123") && loginAttempts == 3) {
+                    // Log the admin login information
+                    Logger.logLogin(username);
+
                     // Navigate to AdminRegister
                     new AdminRegister();
                     dispose(); // Close the login window
@@ -121,6 +124,10 @@ public class AdminLogin extends JFrame {
 
                 if (admin != null) {
                     JOptionPane.showMessageDialog(null, "Login Successful!");
+
+                    // Log the admin login information
+                    Logger.logLogin(username);
+
                     // Navigate to AdminDashboard
                     new AdminDashboard();
                     dispose(); // Close the login window

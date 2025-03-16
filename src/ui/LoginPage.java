@@ -6,7 +6,6 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
 
 import org.bson.Document;
 
@@ -87,6 +86,9 @@ public class LoginPage extends JFrame {
                     String token = authenticateUser(email, password);
                     if (token != null) {
                         JOptionPane.showMessageDialog(null, "Login Successful!");
+
+                        // Log the login information
+                        Logger.logLogin(email);
 
                         // Pass token to StartPage
                         dispose();
