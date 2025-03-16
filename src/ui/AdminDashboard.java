@@ -26,14 +26,26 @@ public class AdminDashboard extends JFrame {
 
         JButton showLogsButton = new JButton("Show Logs");
         AdminDashboardStyle.applyStyle(showLogsButton);
+        JButton accountsButton = new JButton("Accounts");
+        AdminDashboardStyle.applyStyle(accountsButton);
+
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(showLogsButton);
+        buttonPanel.add(accountsButton);
         add(buttonPanel, BorderLayout.CENTER);
 
         showLogsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 showLogs();
+            }
+        });
+
+        accountsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new AdminUserAccounts();
+                dispose(); // Close the current frame
             }
         });
 

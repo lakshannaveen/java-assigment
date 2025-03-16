@@ -2,13 +2,16 @@ package controllers;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCursor;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import models.User;
 import org.bson.Document;
 import database.MongoDBConnection;
 import java.util.Date;
-import com.auth0.jwt.JWT;
+import java.util.ArrayList;
+import java.util.List;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
 public class UserController {
@@ -60,6 +63,7 @@ public class UserController {
                 .withExpiresAt(expirationDate)  // Set the expiration date
                 .sign(algorithm);  // Sign the token with the secret key
     }
+
     // Method to extract email from the JWT token
     public String getEmailFromToken(String token) {
         try {
@@ -71,5 +75,27 @@ public class UserController {
             e.printStackTrace();
             return null;  // Return null if token decoding fails
         }
+    }
+
+    // Method to get all users
+    public List<User> getAllUsers() {
+        List<User> users = new ArrayList<>();
+        try {
+            MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
+            FindIterable<Document> documents = collection.find();
+            MongoCursor<Document> cursor = documents.iterator();
+            while (cursor.hasNext()) {
+                Document doc = cursor.next();
+                User user = new User(
+                        doc.getString("name"),
+                        doc.getString("email"),
+                        doc.getString("password")
+                );
+                users.add(user);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return users;
     }
 }
