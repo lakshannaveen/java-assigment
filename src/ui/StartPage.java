@@ -13,6 +13,8 @@ import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -88,7 +90,28 @@ public class StartPage extends JFrame {
         buttonPanel.add(refreshButton, gbc);
 
         // Search field and button
-        searchField = new JTextField(20);
+        searchField = new JTextField("Search by expense name", 20);
+        searchField.setForeground(Color.GRAY);  // Set initial placeholder color
+
+// Add FocusListener
+        searchField.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (searchField.getText().equals("Search by expense name")) {
+                    searchField.setText("");
+                    searchField.setForeground(Color.BLACK);
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (searchField.getText().isEmpty()) {
+                    searchField.setText("Search by expense name");
+                    searchField.setForeground(Color.GRAY);
+                }
+            }
+        });
+
         searchButton = new JButton("Search");
         StartPageStyle.styleBlueButton(searchButton);  // Apply styling for blue button
 
