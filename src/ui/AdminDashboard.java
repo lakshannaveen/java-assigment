@@ -1,5 +1,4 @@
-
-        package ui;
+package ui;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -26,9 +25,7 @@ public class AdminDashboard extends JFrame {
         add(welcomeLabel, BorderLayout.NORTH);
 
         JButton showLogsButton = new JButton("Show Logs");
-        AdminDashboardStyle.applyStyle(showLogsButton);
         JButton accountsButton = new JButton("Accounts");
-        AdminDashboardStyle.applyStyle(accountsButton);
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(showLogsButton);

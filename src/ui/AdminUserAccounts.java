@@ -48,7 +48,6 @@ public class AdminUserAccounts extends JFrame {
 
         // Back button to return to AdminDashboard
         JButton backButton = new JButton("Back");
-        AdminUserAccountsStyle.applyStyle(backButton);
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
