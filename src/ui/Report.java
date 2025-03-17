@@ -2,6 +2,12 @@ package ui;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 import controllers.ExpenseController;
 import models.ExpenseModel;
 
@@ -9,8 +15,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -101,17 +107,32 @@ public class Report extends JFrame {
     }
 
     private void downloadReport(String email, String pocketName, List<ExpenseModel> expenses) {
-        String fileName = pocketName + "_report.csv";
-        try (FileWriter writer = new FileWriter(fileName)) {
-            writer.append("Month,Expense Name,Amount,Date\n");
+        String fileName = pocketName + "_report.pdf";
+        Document document = new Document();
+        try {
+            PdfWriter.getInstance(document, new FileOutputStream(fileName));
+            document.open();
+            document.add(new Paragraph("Report for Pocket: " + pocketName));
+            document.add(new Paragraph("Email: " + email));
+            document.add(new Paragraph(" ")); // Add a blank line
+
+            PdfPTable table = new PdfPTable(4); // 4 columns
+            table.addCell("Month");
+            table.addCell("Expense Name");
+            table.addCell("Amount");
+            table.addCell("Date");
+
             for (ExpenseModel expense : expenses) {
-                writer.append(expense.getSelectedMonth()).append(",")
-                        .append(expense.getExpenseName()).append(",")
-                        .append(String.valueOf(expense.getAmount())).append(",")
-                        .append(expense.getDate().toString()).append("\n");
+                table.addCell(expense.getSelectedMonth());
+                table.addCell(expense.getExpenseName());
+                table.addCell(String.valueOf(expense.getAmount()));
+                table.addCell(expense.getDate().toString());
             }
+
+            document.add(table);
+            document.close();
             JOptionPane.showMessageDialog(this, "Report downloaded: " + fileName);
-        } catch (IOException e) {
+        } catch (DocumentException | FileNotFoundException e) {
             JOptionPane.showMessageDialog(this, "Error downloading report: " + e.getMessage());
         }
     }
