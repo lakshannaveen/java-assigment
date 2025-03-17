@@ -93,7 +93,7 @@ public class StartPage extends JFrame {
         searchField = new JTextField("Search by expense name", 20);
         searchField.setForeground(Color.GRAY);  // Set initial placeholder color
 
-// Add FocusListener
+        // Add FocusListener
         searchField.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -132,6 +132,23 @@ public class StartPage extends JFrame {
         // Add the main panel to the frame and make it visible
         add(mainPanel);
         setVisible(true);
+
+        // Add Report button
+        JButton reportButton = new JButton("Report");
+        StartPageStyle.styleBlueButton(reportButton);  // Apply styling for blue button
+
+        reportButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new Report(token);  // Navigate to Report page with token
+                dispose();  // Close current window
+            }
+        });
+
+        gbc.gridx = 4;
+        buttonPanel.add(reportButton, gbc);
+
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
     }
 
     private void loadExpenses(String email) {

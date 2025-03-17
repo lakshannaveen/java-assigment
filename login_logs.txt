@@ -8,3 +8,4 @@ Event: Register, UserType: admin, Username: olddesilva, Time: 2025-03-16 17:21:5
 Event: Login, UserType: admin, Username: olddesilva, Time: 2025-03-16 17:22:09
 Event: Login, UserType: admin, Username: naveen, Time: 2025-03-16 21:01:18
 Event: Login, UserType: admin, Username: naveen, Time: 2025-03-16 21:41:09
+Event: Login, UserType: user, Username: old@gmail.com, Time: 2025-03-17 14:11:53
