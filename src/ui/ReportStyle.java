@@ -18,7 +18,7 @@ public class ReportStyle {
 
     public static void styleBlueButton(JButton button) {
         button.setFont(new Font("Serif", Font.BOLD, 18));
-        button.setBackground(new Color(70, 130, 180)); // Steel Blue
+        button.setBackground(Color.BLUE);
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
         button.setBorderPainted(false);
