@@ -5,7 +5,6 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import controllers.ExpenseController;
@@ -62,6 +61,7 @@ public class Report extends JFrame {
             pocketRow.add(pocketLabel);
 
             JButton downloadButton = new JButton("Download");
+            ReportStyle.styleBlueButton(downloadButton);
             downloadButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -78,6 +78,7 @@ public class Report extends JFrame {
 
         // Back button
         JButton backButton = new JButton("Back");
+        ReportStyle.styleGreenButton(backButton);
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
