@@ -37,12 +37,10 @@ public class AdminDashboard extends JFrame {
         add(welcomeLabel, BorderLayout.NORTH);
 
         JButton showLogsButton = new JButton("Show Logs");
-        JButton downloadPdfButton = new JButton("Download PDF");
         JButton accountsButton = new JButton("Accounts");
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(showLogsButton);
-        buttonPanel.add(downloadPdfButton);
         buttonPanel.add(accountsButton);
         add(buttonPanel, BorderLayout.CENTER);
 
@@ -50,18 +48,6 @@ public class AdminDashboard extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 showLogs();
-            }
-        });
-
-        downloadPdfButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    downloadLogsAsPdf();
-                } catch (FileNotFoundException | DocumentException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(AdminDashboard.this, "Failed to download PDF.", "Error", JOptionPane.ERROR_MESSAGE);
-                }
             }
         });
 
@@ -120,7 +106,28 @@ public class AdminDashboard extends JFrame {
             return;
         }
 
-        JOptionPane.showMessageDialog(this, scrollPane, "Log Contents", JOptionPane.INFORMATION_MESSAGE);
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(scrollPane, BorderLayout.CENTER);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton downloadPdfButton = new JButton("Download PDF");
+
+        downloadPdfButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    downloadLogsAsPdf();
+                } catch (FileNotFoundException | DocumentException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(AdminDashboard.this, "Failed to download PDF.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        buttonPanel.add(downloadPdfButton);
+        panel.add(buttonPanel, BorderLayout.SOUTH);
+
+        JOptionPane.showMessageDialog(this, panel, "Log Contents", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void downloadLogsAsPdf() throws FileNotFoundException, DocumentException {
