@@ -23,7 +23,7 @@ public class AdminUserAccounts extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        JLabel accountsLabel = new JLabel("Admin User Accounts", SwingConstants.CENTER);
+        JLabel accountsLabel = new JLabel("User Accounts", SwingConstants.CENTER);
         AdminUserAccountsStyle.applyStyle(accountsLabel);
         add(accountsLabel, BorderLayout.NORTH);
 
