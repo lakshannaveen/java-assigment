@@ -8,20 +8,32 @@ import models.User;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import java.util.Date;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class RegisterPage extends JFrame {
-
     private JTextField nameField;
     private JTextField emailField;
     private JPasswordField passwordField;
     private JButton registerButton;
     private JButton backButton;
     private UserController userController;
+    private ResourceBundle bundle;
 
     public RegisterPage() {
+        try {
+            // Get the current locale from HomePage
+            bundle = ResourceBundle.getBundle("resources/messages",
+                    HomePage.getCurrentLocale(),
+                    new UTF8ResourceBundleControl());
+        } catch (Exception e) {
+            e.printStackTrace();
+            bundle = ResourceBundle.getBundle("resources/messages", Locale.ENGLISH);
+        }
+
         userController = new UserController();
 
-        setTitle("Register - Expense Tracker");
+        setTitle(bundle.getString("title") + " - " + bundle.getString("register"));
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -29,23 +41,23 @@ public class RegisterPage extends JFrame {
         // Create the main panel and apply styles
         JPanel mainPanel = new JPanel(new BorderLayout());
         JPanel formPanel = new JPanel(new GridBagLayout());
-        formPanel.setBorder(BorderFactory.createTitledBorder("Register Form"));
+        formPanel.setBorder(BorderFactory.createTitledBorder(bundle.getString("register") + " " + bundle.getString("form")));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         // Create and add the components
-        JLabel nameLabel = new JLabel("Name:");
+        JLabel nameLabel = new JLabel(bundle.getString("name") + ":");
         nameField = new JTextField(20);
 
-        JLabel emailLabel = new JLabel("Email:");
+        JLabel emailLabel = new JLabel(bundle.getString("email") + ":");
         emailField = new JTextField(20);
 
-        JLabel passwordLabel = new JLabel("Password:");
+        JLabel passwordLabel = new JLabel(bundle.getString("password") + ":");
         passwordField = new JPasswordField(20);
 
-        registerButton = new JButton("Register");
-        backButton = new JButton("Back");
+        registerButton = new JButton(bundle.getString("register"));
+        backButton = new JButton(bundle.getString("back"));
         backButton.setContentAreaFilled(false);
         backButton.setBorderPainted(false);
 
@@ -59,29 +71,29 @@ public class RegisterPage extends JFrame {
             String password = new String(passwordField.getPassword());
 
             if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please fill all fields!", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, bundle.getString("fill.all.fields"), "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             if (name.length() > 25) {
-                JOptionPane.showMessageDialog(this, "Name must not exceed 25 characters.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, bundle.getString("name.length"), "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             if (!isValidEmail(email)) {
-                JOptionPane.showMessageDialog(this, "Invalid email format.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, bundle.getString("invalid.email"), "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             if (password.length() < 8) {
-                JOptionPane.showMessageDialog(this, "Password must be at least 8 characters long.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, bundle.getString("password.length"), "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             // Create the user object
             User user = new User(name, email, password);
             if (userController.registerUser(user)) {
-                JOptionPane.showMessageDialog(this, "Registration Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, bundle.getString("register.success"), "Success", JOptionPane.INFORMATION_MESSAGE);
 
                 // Log the registration event
                 Logger.logRegister(email, "user");
@@ -94,7 +106,7 @@ public class RegisterPage extends JFrame {
                 // Pass the token to the StartPage
                 new StartPage(token); // Use the generated token here
             } else {
-                JOptionPane.showMessageDialog(this, "Registration Failed!", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, bundle.getString("register.failed"), "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
