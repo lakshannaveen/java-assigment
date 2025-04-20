@@ -2,26 +2,65 @@ package ui;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.io.IOException;
+import java.lang.IllegalAccessException;
 
 public class HomePage extends JFrame {
+    private ResourceBundle bundle;
+    private JLabel titleLabel;
+    private JLabel welcomeLabel;
+    private JButton loginButton;
+    private JButton registerButton;
+    private JComboBox<String> languageComboBox;
+
     public HomePage() {
-        setTitle("Expense Tracker");
-        setSize(400, 300);
+        try {
+            // Load default bundle with UTF-8 support
+            bundle = ResourceBundle.getBundle("resources/messages",
+                    Locale.ENGLISH,
+                    new UTF8ResourceBundleControl());
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Fallback to default loading
+            bundle = ResourceBundle.getBundle("resources/messages", Locale.ENGLISH);
+            JOptionPane.showMessageDialog(this,
+                    "Error loading language resources. Using English as fallback.",
+                    "Resource Error",
+                    JOptionPane.WARNING_MESSAGE);
+        }
+
+        initializeUI();
+    }
+
+    private void initializeUI() {
+        setTitle(bundle.getString("title"));
+        setSize(400, 350);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Create the panel and apply styles
+        // Create components
         JPanel mainPanel = new JPanel(new BorderLayout());
+        titleLabel = new JLabel(bundle.getString("title"), JLabel.CENTER);
+        welcomeLabel = new JLabel(bundle.getString("welcome"), JLabel.CENTER);
+        loginButton = new JButton(bundle.getString("login"));
+        registerButton = new JButton(bundle.getString("register"));
 
-        JLabel titleLabel = new JLabel("Expense Tracker", JLabel.CENTER);
-        JLabel welcomeLabel = new JLabel("Welcome to Expense Tracker", JLabel.CENTER);
-        JButton loginButton = new JButton("Login");
-        JButton registerButton = new JButton("Register");
+        // Language selection
+        String[] languages = {"English", "Singlish"};
+        languageComboBox = new JComboBox<>(languages);
+        JLabel languageLabel = new JLabel(bundle.getString("language") + ": ");
 
-        // Apply styles from HomePageStyle
+        JPanel languagePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        languagePanel.setOpaque(false);
+        languagePanel.add(languageLabel);
+        languagePanel.add(languageComboBox);
+
+        // Apply styles
         HomePageStyle.applyStyles(titleLabel, welcomeLabel, loginButton, registerButton, mainPanel);
 
-        // Create button panel and add buttons
+        // Button panel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
         buttonPanel.setOpaque(false);
         buttonPanel.add(loginButton);
@@ -30,30 +69,64 @@ public class HomePage extends JFrame {
         // Button actions
         loginButton.addActionListener(e -> {
             dispose();
-            new LoginPage(); // Open Login Page
+            new LoginPage();
         });
 
         registerButton.addActionListener(e -> {
             dispose();
-            new RegisterPage(); // Open Register Page
+            new RegisterPage();
         });
 
-        // Add components to the main panel
+        // Language selection action with error handling
+        languageComboBox.addActionListener(e -> {
+            String selectedLanguage = (String) languageComboBox.getSelectedItem();
+            Locale locale = "Singlish".equals(selectedLanguage) ? new Locale("si")
+                    : Locale.ENGLISH;
+            try {
+                bundle = ResourceBundle.getBundle("resources/messages", locale, new UTF8ResourceBundleControl());
+                updateTexts();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this,
+                        "Error loading " + selectedLanguage + " resources",
+                        "Language Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        // Layout components
         mainPanel.add(titleLabel, BorderLayout.NORTH);
         mainPanel.add(welcomeLabel, BorderLayout.CENTER);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+        mainPanel.add(languagePanel, BorderLayout.PAGE_START);
 
-        // Add panel to the frame
         add(mainPanel);
         setVisible(true);
     }
 
+    private void updateTexts() {
+        try {
+            setTitle(bundle.getString("title"));
+            titleLabel.setText(bundle.getString("title"));
+            welcomeLabel.setText(bundle.getString("welcome"));
+            loginButton.setText(bundle.getString("login"));
+            registerButton.setText(bundle.getString("register"));
+            ((JLabel) ((JPanel) languageComboBox.getParent()).getComponent(0)).setText(bundle.getString("language") + ": ");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String[] args) {
-        // Run the HomePage
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
+        SwingUtilities.invokeLater(() -> {
+            try {
                 new HomePage();
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null,
+                        "Failed to initialize application",
+                        "Startup Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
         });
     }

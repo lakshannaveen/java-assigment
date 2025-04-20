@@ -8,7 +8,8 @@ import javax.swing.Timer;
 
 public class HomePageStyle {
 
-    public static void applyStyles(JLabel titleLabel, JLabel welcomeLabel, JButton loginButton, JButton registerButton, JPanel panel) {
+    public static void applyStyles(JLabel titleLabel, JLabel welcomeLabel, JButton loginButton,
+                                   JButton registerButton, JPanel panel) {
         // Set styles for components
         titleLabel.setFont(new Font("Arial", Font.BOLD, 22));
         titleLabel.setForeground(new Color(34, 139, 34)); // Green color
