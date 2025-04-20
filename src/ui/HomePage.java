@@ -14,17 +14,18 @@ public class HomePage extends JFrame {
     private JButton loginButton;
     private JButton registerButton;
     private JComboBox<String> languageComboBox;
+    private static Locale currentLocale = Locale.ENGLISH; // Track current locale
 
     public HomePage() {
         try {
             // Load default bundle with UTF-8 support
             bundle = ResourceBundle.getBundle("resources/messages",
-                    Locale.ENGLISH,
+                    currentLocale,
                     new UTF8ResourceBundleControl());
         } catch (Exception e) {
             e.printStackTrace();
             // Fallback to default loading
-            bundle = ResourceBundle.getBundle("resources/messages", Locale.ENGLISH);
+            bundle = ResourceBundle.getBundle("resources/messages", currentLocale);
             JOptionPane.showMessageDialog(this,
                     "Error loading language resources. Using English as fallback.",
                     "Resource Error",
@@ -50,6 +51,8 @@ public class HomePage extends JFrame {
         // Language selection
         String[] languages = {"English", "Singlish"};
         languageComboBox = new JComboBox<>(languages);
+        // Set the selected item based on current locale
+        languageComboBox.setSelectedItem(currentLocale.equals(new Locale("si")) ? "Singlish" : "English");
         JLabel languageLabel = new JLabel(bundle.getString("language") + ": ");
 
         JPanel languagePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -80,10 +83,10 @@ public class HomePage extends JFrame {
         // Language selection action with error handling
         languageComboBox.addActionListener(e -> {
             String selectedLanguage = (String) languageComboBox.getSelectedItem();
-            Locale locale = "Singlish".equals(selectedLanguage) ? new Locale("si")
+            currentLocale = "Singlish".equals(selectedLanguage) ? new Locale("si")
                     : Locale.ENGLISH;
             try {
-                bundle = ResourceBundle.getBundle("resources/messages", locale, new UTF8ResourceBundleControl());
+                bundle = ResourceBundle.getBundle("resources/messages", currentLocale, new UTF8ResourceBundleControl());
                 updateTexts();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -115,6 +118,10 @@ public class HomePage extends JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static Locale getCurrentLocale() {
+        return currentLocale;
     }
 
     public static void main(String[] args) {

@@ -15,13 +15,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.regex.Pattern;
 import java.util.Date;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class LoginPage extends JFrame {
-
     private JTextField emailField;
     private JPasswordField passwordField;
     private JButton loginButton;
     private JButton backButton;
+    private ResourceBundle bundle;
 
     private static final String CONNECTION_STRING = "mongodb+srv://naveen:uD4DxPM4lBhZ4gOH@cluster0.lbyqk.mongodb.net/test?retryWrites=true&w=majority&appName=Cluster0";
     private static final String DATABASE_NAME = "test";
@@ -31,26 +33,40 @@ public class LoginPage extends JFrame {
     private int loginAttempts = 0; // Counter for login attempts
 
     public LoginPage() {
-        setTitle("Login - Expense Tracker");
+        try {
+            // Get the current locale from HomePage
+            bundle = ResourceBundle.getBundle("resources/messages",
+                    HomePage.getCurrentLocale(),
+                    new UTF8ResourceBundleControl());
+        } catch (Exception e) {
+            e.printStackTrace();
+            bundle = ResourceBundle.getBundle("resources/messages", Locale.ENGLISH);
+        }
+
+        initializeUI();
+    }
+
+    private void initializeUI() {
+        setTitle(bundle.getString("title") + " - " + bundle.getString("login"));
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         JPanel mainPanel = new JPanel(new BorderLayout());
         JPanel formPanel = new JPanel(new GridBagLayout());
-        formPanel.setBorder(BorderFactory.createTitledBorder("Login Form"));
+        formPanel.setBorder(BorderFactory.createTitledBorder(bundle.getString("login") + " " + bundle.getString("form")));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel emailLabel = new JLabel("Email:");
+        JLabel emailLabel = new JLabel(bundle.getString("email") + ":");
         emailField = new JTextField(20);
 
-        JLabel passwordLabel = new JLabel("Password:");
+        JLabel passwordLabel = new JLabel(bundle.getString("password") + ":");
         passwordField = new JPasswordField(20);
 
-        loginButton = new JButton("Login");
-        backButton = new JButton("Back");
+        loginButton = new JButton(bundle.getString("login"));
+        backButton = new JButton(bundle.getString("back"));
         backButton.setContentAreaFilled(false);
         backButton.setBorderPainted(false);
 
@@ -66,35 +82,35 @@ public class LoginPage extends JFrame {
                     loginAttempts++; // Increment the counter for admin login attempts
                     if (loginAttempts >= 3) {
                         // Navigate to AdminLogin after 3 attempts with the email "admin123"
-                        JOptionPane.showMessageDialog(null, "Navigating to Admin Login...");
+                        JOptionPane.showMessageDialog(null, bundle.getString("navigate.admin"));
                         dispose();
-                        new AdminLogin(); // Open AdminLogin page
+                        new AdminLogin();
                         return;
                     }
                 } else {
                     // Perform regular validation for non-admin users
                     if (!isValidEmail(email)) {
-                        JOptionPane.showMessageDialog(null, "Invalid email format.");
+                        JOptionPane.showMessageDialog(null, bundle.getString("invalid.email"));
                         return;
                     }
 
                     if (password.length() < 8) {
-                        JOptionPane.showMessageDialog(null, "Password must be at least 8 characters long.");
+                        JOptionPane.showMessageDialog(null, bundle.getString("password.length"));
                         return;
                     }
 
                     String token = authenticateUser(email, password);
                     if (token != null) {
-                        JOptionPane.showMessageDialog(null, "Login Successful!");
+                        JOptionPane.showMessageDialog(null, bundle.getString("login.success"));
 
                         // Log the login information
                         Logger.logLogin(email, "user");
 
                         // Pass token to StartPage
                         dispose();
-                        new StartPage(token); // Pass the token to StartPage constructor
+                        new StartPage(token);
                     } else {
-                        JOptionPane.showMessageDialog(null, "Invalid email or password.");
+                        JOptionPane.showMessageDialog(null, bundle.getString("invalid.credentials"));
                     }
                 }
             }
@@ -104,7 +120,7 @@ public class LoginPage extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
-                new HomePage(); // Navigate to HomePage.java instead of StartPage.java
+                new HomePage();
             }
         });
 
