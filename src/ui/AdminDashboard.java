@@ -1,25 +1,14 @@
 package ui;
 
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Element;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Phrase;
-import com.itextpdf.text.pdf.PdfPCell;
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
+import java.awt.event.*;
+import java.io.*;
 
 public class AdminDashboard extends JFrame {
 
@@ -27,22 +16,40 @@ public class AdminDashboard extends JFrame {
 
     public AdminDashboard() {
         setTitle("Admin Dashboard");
-        setSize(600, 400);
+        setSize(700, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setLayout(new BorderLayout());
+
+        // Custom gradient panel
+        JPanel mainPanel = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g;
+                Color color1 = new Color(230, 240, 255);
+                Color color2 = new Color(180, 200, 255);
+                GradientPaint gp = new GradientPaint(0, 0, color1, 0, getHeight(), color2);
+                g2d.setPaint(gp);
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+            }
+        };
 
         JLabel welcomeLabel = new JLabel("Welcome to Admin Dashboard", SwingConstants.CENTER);
-        AdminDashboardStyle.applyStyle(welcomeLabel);
-        add(welcomeLabel, BorderLayout.NORTH);
+        AdminDashboardStyle.applyHeaderStyle(welcomeLabel);
+        mainPanel.add(welcomeLabel, BorderLayout.NORTH);
 
+        // Buttons Panel
         JButton showLogsButton = new JButton("Show Logs");
         JButton accountsButton = new JButton("Accounts");
+        AdminDashboardStyle.applyButtonStyle(showLogsButton);
+        AdminDashboardStyle.applyButtonStyle(accountsButton);
 
-        JPanel buttonPanel = new JPanel();
+        JPanel buttonPanel = new JPanel(new FlowLayout());
+        buttonPanel.setOpaque(false);
         buttonPanel.add(showLogsButton);
         buttonPanel.add(accountsButton);
-        add(buttonPanel, BorderLayout.CENTER);
+
+        mainPanel.add(buttonPanel, BorderLayout.CENTER);
+        add(mainPanel);
 
         showLogsButton.addActionListener(new ActionListener() {
             @Override
@@ -59,7 +66,7 @@ public class AdminDashboard extends JFrame {
             }
         });
 
-        AdminDashboardStyle.applyStyle(this);
+        AdminDashboardStyle.applyFrameStyle(this);
         setVisible(true);
     }
 
@@ -72,6 +79,9 @@ public class AdminDashboard extends JFrame {
             }
         };
         JTable table = new JTable(tableModel);
+        JTableHeader header = table.getTableHeader();
+        header.setBackground(Color.LIGHT_GRAY);
+
         JScrollPane scrollPane = new JScrollPane(table);
 
         try (BufferedReader reader = new BufferedReader(new FileReader(LOG_FILE_PATH))) {
@@ -135,7 +145,8 @@ public class AdminDashboard extends JFrame {
         PdfWriter.getInstance(document, new FileOutputStream("logs.pdf"));
         document.open();
 
-        Font font = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
+        // Use fully qualified com.itextpdf.text.Font
+        com.itextpdf.text.Font font = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 12, com.itextpdf.text.Font.BOLD);
         Paragraph title = new Paragraph("Log Contents", font);
         title.setAlignment(Element.ALIGN_CENTER);
         document.add(title);
