@@ -9,6 +9,8 @@ import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class AdminDashboard extends JFrame {
 
@@ -36,6 +38,23 @@ public class AdminDashboard extends JFrame {
         JLabel welcomeLabel = new JLabel("Welcome to Admin Dashboard", SwingConstants.CENTER);
         AdminDashboardStyle.applyHeaderStyle(welcomeLabel);
         mainPanel.add(welcomeLabel, BorderLayout.NORTH);
+
+        // Clock Panel
+        JPanel clockPanel = new JPanel();
+        JLabel clockLabel = new JLabel();
+        clockPanel.add(clockLabel);
+        mainPanel.add(clockPanel, BorderLayout.SOUTH);
+
+        // Set the clock to update every second
+        Timer timer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String currentDateTime = dateFormat.format(new Date());
+                clockLabel.setText(currentDateTime);
+            }
+        });
+        timer.start();
 
         // Buttons Panel
         JButton showLogsButton = new JButton("Show Logs");
