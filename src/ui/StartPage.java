@@ -15,6 +15,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -46,10 +48,28 @@ public class StartPage extends JFrame {
         // Main panel setup
         JPanel mainPanel = new JPanel(new BorderLayout());
 
+        // Create clock panel
+        JPanel clockPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JLabel clockLabel = new JLabel();
+        clockLabel.setFont(new Font("Serif", Font.BOLD, 16));
+        clockPanel.add(clockLabel);
+
+        // Initialize and start the clock timer
+        Timer clockTimer = new Timer(1000, e -> {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            clockLabel.setText( sdf.format(new Date()));
+        });
+        clockTimer.start();
+
         // Welcome label with the username or "Guest" if email is null
         JLabel welcomeLabel = new JLabel("Welcome to My Expense, " + username + "!", SwingConstants.CENTER);
         welcomeLabel.setFont(new Font("Serif", Font.BOLD, 24));
-        mainPanel.add(welcomeLabel, BorderLayout.NORTH);
+
+        // Create north panel to hold both welcome label and clock
+        JPanel northPanel = new JPanel(new BorderLayout());
+        northPanel.add(welcomeLabel, BorderLayout.NORTH);
+        northPanel.add(clockPanel, BorderLayout.SOUTH);
+        mainPanel.add(northPanel, BorderLayout.NORTH);
 
         // Tabbed pane to display expenses by pocket name
         tabbedPane = new JTabbedPane();
@@ -127,12 +147,6 @@ public class StartPage extends JFrame {
         gbc.gridx = 3;
         buttonPanel.add(searchButton, gbc);
 
-        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
-
-        // Add the main panel to the frame and make it visible
-        add(mainPanel);
-        setVisible(true);
-
         // Add Report button
         JButton reportButton = new JButton("Report");
         StartPageStyle.styleBlueButton(reportButton);  // Apply styling for blue button
@@ -149,6 +163,10 @@ public class StartPage extends JFrame {
         buttonPanel.add(reportButton, gbc);
 
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        // Add the main panel to the frame and make it visible
+        add(mainPanel);
+        setVisible(true);
     }
 
     private void loadExpenses(String email) {
