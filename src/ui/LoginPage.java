@@ -47,26 +47,26 @@ public class LoginPage extends JFrame {
     }
 
     private void initializeUI() {
-        setTitle(bundle.getString("title") + " - " + bundle.getString("login"));
+        setTitle(getLocalizedString("title") + " - " + getLocalizedString("login"));
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         JPanel mainPanel = new JPanel(new BorderLayout());
         JPanel formPanel = new JPanel(new GridBagLayout());
-        formPanel.setBorder(BorderFactory.createTitledBorder(bundle.getString("login") + " " + bundle.getString("form")));
+        formPanel.setBorder(BorderFactory.createTitledBorder(getLocalizedString("login") + " " + getLocalizedString("form")));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel emailLabel = new JLabel(bundle.getString("email") + ":");
+        JLabel emailLabel = new JLabel(getLocalizedString("email") + ":");
         emailField = new JTextField(20);
 
-        JLabel passwordLabel = new JLabel(bundle.getString("password") + ":");
+        JLabel passwordLabel = new JLabel(getLocalizedString("password") + ":");
         passwordField = new JPasswordField(20);
 
-        loginButton = new JButton(bundle.getString("login"));
-        backButton = new JButton(bundle.getString("back"));
+        loginButton = new JButton(getLocalizedString("login"));
+        backButton = new JButton(getLocalizedString("back"));
         backButton.setContentAreaFilled(false);
         backButton.setBorderPainted(false);
 
@@ -88,23 +88,23 @@ public class LoginPage extends JFrame {
                     else {
                         JOptionPane.showMessageDialog(null, "Admin click count: " + loginAttempts);
                     }
-                    return; 
+                    return;
                 }
                 else {
                     // Perform regular validation for non-admin users
                     if (!isValidEmail(email)) {
-                        JOptionPane.showMessageDialog(null, bundle.getString("invalid.email"));
+                        JOptionPane.showMessageDialog(null, getLocalizedString("invalid.email"));
                         return;
                     }
 
                     if (password.length() < 8) {
-                        JOptionPane.showMessageDialog(null, bundle.getString("password.length"));
+                        JOptionPane.showMessageDialog(null, getLocalizedString("password.length"));
                         return;
                     }
 
                     String token = authenticateUser(email, password);
                     if (token != null) {
-                        JOptionPane.showMessageDialog(null, bundle.getString("login.success"));
+                        JOptionPane.showMessageDialog(null, getLocalizedString("login.success", "Login successful!"));
 
                         // Log the login information
                         Logger.logLogin(email, "user");
@@ -113,7 +113,7 @@ public class LoginPage extends JFrame {
                         dispose();
                         new StartPage(token);
                     } else {
-                        JOptionPane.showMessageDialog(null, bundle.getString("invalid.credentials"));
+                        JOptionPane.showMessageDialog(null, getLocalizedString("invalid.credentials", "Invalid email or password"));
                     }
                 }
             }
@@ -157,6 +157,18 @@ public class LoginPage extends JFrame {
 
         add(mainPanel);
         setVisible(true);
+    }
+
+    private String getLocalizedString(String key) {
+        return getLocalizedString(key, key);
+    }
+
+    private String getLocalizedString(String key, String defaultValue) {
+        try {
+            return bundle.getString(key);
+        } catch (Exception e) {
+            return defaultValue;
+        }
     }
 
     private String authenticateUser(String email, String password) {
