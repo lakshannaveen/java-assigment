@@ -79,15 +79,18 @@ public class LoginPage extends JFrame {
                 String password = new String(passwordField.getPassword());
 
                 if (email.equals("admin123")) {
-                    loginAttempts++; // Increment the counter for admin login attempts
+                    loginAttempts++; // Increment counter
                     if (loginAttempts >= 3) {
-                        // Navigate to AdminLogin after 3 attempts with the email "admin123"
-                        JOptionPane.showMessageDialog(null, bundle.getString("navigate.admin"));
+                        JOptionPane.showMessageDialog(null, "Navigating to admin login...");
                         dispose();
                         new AdminLogin();
-                        return;
                     }
-                } else {
+                    else {
+                        JOptionPane.showMessageDialog(null, "Admin click count: " + loginAttempts);
+                    }
+                    return; 
+                }
+                else {
                     // Perform regular validation for non-admin users
                     if (!isValidEmail(email)) {
                         JOptionPane.showMessageDialog(null, bundle.getString("invalid.email"));

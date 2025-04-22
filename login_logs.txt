@@ -17,3 +17,4 @@ Event: Login, UserType: user, Username: old@gmail.com, Time: 2025-03-17 14:36:00
 Event: Login, UserType: user, Username: old@gmail.com, Time: 2025-04-19 09:34:03
 Event: Login, UserType: user, Username: old@gmail.com, Time: 2025-04-20 11:11:10
 Event: Register, UserType: user, Username: test@gmail.com, Time: 2025-04-20 11:17:45
+Event: Login, UserType: admin, Username: naveen, Time: 2025-04-22 11:18:59

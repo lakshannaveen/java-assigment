@@ -19,7 +19,7 @@ public class UserController {
     private final MongoDatabase database;
 
     // Secret key for signing the JWT token (hardcoded)
-    private static final String SECRET_KEY = "1020"; // Change this to a strong secret key
+    private static final String SECRET_KEY = "1020"; // anytime change
 
     public UserController() {
         MongoDBConnection mongoDBConnection = new MongoDBConnection();
