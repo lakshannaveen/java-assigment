@@ -34,17 +34,20 @@ public class Report extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Main panel setup
+        // Main panel setup with padding and alignment adjustments
         JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Welcome label
+        // Welcome label with improved styling
         JLabel welcomeLabel = new JLabel("Welcome to the Report Page!", SwingConstants.CENTER);
         welcomeLabel.setFont(new Font("Serif", Font.BOLD, 24));
+        welcomeLabel.setForeground(Color.DARK_GRAY);  // Set color to dark gray for contrast
         mainPanel.add(welcomeLabel, BorderLayout.NORTH);
 
         // Fetch and display pocket names with download buttons
         JPanel pocketPanel = new JPanel();
         pocketPanel.setLayout(new BoxLayout(pocketPanel, BoxLayout.Y_AXIS));
+        pocketPanel.setBackground(new Color(245, 245, 245));  // Light gray background for pocket panel
 
         String email = getEmailFromToken(token);
         List<ExpenseModel> expenses = expenseController.getExpensesByEmail(email);
@@ -53,11 +56,14 @@ public class Report extends JFrame {
         Map<String, List<ExpenseModel>> expensesByPocketName = expenses.stream()
                 .collect(Collectors.groupingBy(ExpenseModel::getPocketName));
 
+        // Adjusted spacing and alignment for each pocket name and its button
         for (String pocketName : expensesByPocketName.keySet()) {
-            JPanel pocketRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            JPanel pocketRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));  // Spaced components for clarity
+            pocketRow.setBackground(new Color(245, 245, 245));  // Ensure consistency in background
 
             JLabel pocketLabel = new JLabel(pocketName);
             pocketLabel.setFont(new Font("Serif", Font.BOLD, 18));
+            pocketLabel.setPreferredSize(new Dimension(300, 30));  // Control the width for better alignment
             pocketRow.add(pocketLabel);
 
             JButton downloadButton = new JButton("Download");
@@ -74,9 +80,10 @@ public class Report extends JFrame {
         }
 
         JScrollPane scrollPane = new JScrollPane(pocketPanel);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Add padding around the scrollPane
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
-        // Back button
+        // Back button with improved styling
         JButton backButton = new JButton("Back");
         ReportStyle.styleGreenButton(backButton);
         backButton.addActionListener(new ActionListener() {
@@ -88,6 +95,7 @@ public class Report extends JFrame {
         });
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.setBackground(Color.WHITE);  // Ensure the button panel has a clean background
         buttonPanel.add(backButton);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
