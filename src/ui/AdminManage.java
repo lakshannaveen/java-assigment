@@ -6,8 +6,6 @@ import models.AdminModel;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 
 public class AdminManage extends JFrame {
@@ -94,35 +92,27 @@ public class AdminManage extends JFrame {
         JButton button = new JButton(text) {
             @Override
             protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
                 if (getModel().isRollover()) {
-                    // Hover state - slightly darker blue
-                    g.setColor(new Color(70, 130, 180));
+                    g2.setColor(new Color(70, 130, 180)); // Hover color
                 } else {
-                    // Normal state - standard blue
-                    g.setColor(new Color(100, 149, 237));
+                    g2.setColor(new Color(100, 149, 237)); // Default blue
                 }
-                g.fillRect(0, 0, getWidth(), getHeight());
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                g2.dispose();
+
+                // Set color for text drawing
+                setForeground(Color.WHITE);
                 super.paintComponent(g);
             }
         };
 
         button.setContentAreaFilled(false);
-        button.setOpaque(true);
+        button.setOpaque(false); // Important to prevent white flashes
         button.setForeground(Color.WHITE);
         button.setFont(new Font("Arial", Font.BOLD, 14));
         button.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
         button.setFocusPainted(false);
-
-        // Add mouse listener for hover effect
-        button.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(70, 130, 180)); // Darker blue on hover
-            }
-
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(100, 149, 237)); // Original blue
-            }
-        });
 
         return button;
     }
