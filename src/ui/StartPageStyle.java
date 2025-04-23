@@ -10,31 +10,32 @@ import java.awt.event.MouseEvent;
 public class StartPageStyle {
 
     private static final Dimension BUTTON_SIZE = new Dimension(150, 40);
-    private static final Dimension SEARCH_FIELD_SIZE = new Dimension(150, 30); // Narrower search field
+    private static final Dimension SEARCH_FIELD_SIZE = new Dimension(150, 30);
     private static final Font BUTTON_FONT = new Font("Arial", Font.BOLD, 14);
     private static final Font SEARCH_FONT = new Font("Arial", Font.PLAIN, 14);
+    private static final Font WELCOME_FONT = new Font("Serif", Font.BOLD, 24);
+    private static final Font CLOCK_FONT = new Font("Serif", Font.BOLD, 16);
 
     public static void styleGreenButton(JButton button) {
         button.setFont(BUTTON_FONT);
         button.setPreferredSize(BUTTON_SIZE);
         button.setMinimumSize(BUTTON_SIZE);
         button.setMaximumSize(BUTTON_SIZE);
-        button.setBackground(new Color(46, 125, 50)); // Darker green
+        button.setBackground(new Color(46, 125, 50));
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
         button.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        // Hover effects
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                button.setBackground(new Color(56, 142, 60)); // Lighter green
+                button.setBackground(new Color(56, 142, 60));
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                button.setBackground(new Color(46, 125, 50)); // Original green
+                button.setBackground(new Color(46, 125, 50));
             }
         });
     }
@@ -44,22 +45,21 @@ public class StartPageStyle {
         button.setPreferredSize(BUTTON_SIZE);
         button.setMinimumSize(BUTTON_SIZE);
         button.setMaximumSize(BUTTON_SIZE);
-        button.setBackground(new Color(198, 40, 40)); // Darker red
+        button.setBackground(new Color(198, 40, 40));
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
         button.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        // Hover effects
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                button.setBackground(new Color(229, 57, 53)); // Lighter red
+                button.setBackground(new Color(229, 57, 53));
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                button.setBackground(new Color(198, 40, 40)); // Original red
+                button.setBackground(new Color(198, 40, 40));
             }
         });
     }
@@ -69,22 +69,21 @@ public class StartPageStyle {
         button.setPreferredSize(BUTTON_SIZE);
         button.setMinimumSize(BUTTON_SIZE);
         button.setMaximumSize(BUTTON_SIZE);
-        button.setBackground(new Color(25, 118, 210)); // Darker blue
+        button.setBackground(new Color(25, 118, 210));
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
         button.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        // Hover effects
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                button.setBackground(new Color(30, 136, 229)); // Lighter blue
+                button.setBackground(new Color(30, 136, 229));
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                button.setBackground(new Color(25, 118, 210)); // Original blue
+                button.setBackground(new Color(25, 118, 210));
             }
         });
     }
@@ -98,6 +97,26 @@ public class StartPageStyle {
                 BorderFactory.createLineBorder(new Color(200, 200, 200)),
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
+    }
+
+    public static void styleWelcomePanel(JPanel panel) {
+        panel.setBackground(Color.BLACK);
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+    }
+
+    public static void styleWelcomeLabel(JLabel label) {
+        label.setFont(WELCOME_FONT);
+        label.setForeground(Color.WHITE);
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+    }
+
+    public static void styleClockPanel(JPanel panel) {
+        panel.setBackground(Color.BLACK);
+    }
+
+    public static void styleClockLabel(JLabel label) {
+        label.setFont(CLOCK_FONT);
+        label.setForeground(Color.WHITE);
     }
 
     public static void styleTable(JTable table) {

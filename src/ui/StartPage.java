@@ -1,5 +1,4 @@
 package ui;
-
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import controllers.ExpenseController;
@@ -48,25 +47,27 @@ public class StartPage extends JFrame {
         // Main panel setup
         JPanel mainPanel = new JPanel(new BorderLayout());
 
-        // Create clock panel
+        // Create clock panel with dark theme
         JPanel clockPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        StartPageStyle.styleClockPanel(clockPanel);
         JLabel clockLabel = new JLabel();
-        clockLabel.setFont(new Font("Serif", Font.BOLD, 16));
+        StartPageStyle.styleClockLabel(clockLabel);
         clockPanel.add(clockLabel);
 
         // Initialize and start the clock timer
         Timer clockTimer = new Timer(1000, e -> {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            clockLabel.setText( sdf.format(new Date()));
+            clockLabel.setText(sdf.format(new Date()));
         });
         clockTimer.start();
 
-        // Welcome label with the username or "Guest" if email is null
+        // Welcome label with dark theme
         JLabel welcomeLabel = new JLabel("Welcome to My Expense, " + username + "!", SwingConstants.CENTER);
-        welcomeLabel.setFont(new Font("Serif", Font.BOLD, 24));
+        StartPageStyle.styleWelcomeLabel(welcomeLabel);
 
-        // Create north panel to hold both welcome label and clock
+        // Create north panel with dark theme
         JPanel northPanel = new JPanel(new BorderLayout());
+        StartPageStyle.styleWelcomePanel(northPanel);
         northPanel.add(welcomeLabel, BorderLayout.NORTH);
         northPanel.add(clockPanel, BorderLayout.SOUTH);
         mainPanel.add(northPanel, BorderLayout.NORTH);
@@ -84,16 +85,15 @@ public class StartPage extends JFrame {
         gbc.insets = new Insets(5, 5, 5, 5);
 
         JButton startButton = new JButton("Create a pocket");
-        StartPageStyle.styleGreenButton(startButton);  // Apply styling for green button
+        StartPageStyle.styleGreenButton(startButton);
 
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new Expense(token);  // Pass the token to Expense
-                dispose();  // Close current window
+                new Expense(token);
+                dispose();
             }
         });
-
         JButton refreshButton = new JButton("Refresh");
         StartPageStyle.styleGreenButton(refreshButton);  // Apply styling for green button
 
