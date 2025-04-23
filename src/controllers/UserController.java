@@ -26,8 +26,16 @@ public class UserController {
     // Email configuration (should be moved to config file in production)
     private static final String EMAIL_USERNAME = "trackerexpense3@gmail.com";
     private static final String EMAIL_PASSWORD = "cjys lyfz tqva jiqd";
-    private static final String EMAIL_SUBJECT = "Account Created Successfully";
-    private static final String EMAIL_BODY = "Dear %s,\n\nYour account has been created successfully!\n\nThank you for registering with us.";
+    private static final String EMAIL_SUBJECT = "Welcome to Personal Expense Tracker - Account Created Successfully";
+    private static final String EMAIL_BODY = "Dear %s,\n\n" +
+            "Welcome to the Personal Expense Tracker!\n\n" +
+            "We are pleased to inform you that your account has been created successfully.\n" +
+            "You can now begin tracking your expenses, managing your pockets, and gaining better control over your finances.\n\n" +
+            "If you have any questions or need support, feel free to reach out to our team.\n\n" +
+            "Best regards,\n" +
+            "The Personal Expense Tracker Team\n\n" +
+            "-----------------------------------------\n" +
+            "This is an automated message. Please do not reply to this email.";
 
     public UserController() {
         MongoDBConnection mongoDBConnection = new MongoDBConnection();
