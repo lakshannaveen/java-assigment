@@ -162,6 +162,21 @@ public class StartPage extends JFrame {
         gbc.gridx = 4;
         buttonPanel.add(reportButton, gbc);
 
+        // Add Logout button
+        JButton logoutButton = new JButton("Logout");
+        StartPageStyle.styleRedButton(logoutButton);  // Apply styling for red button
+
+        logoutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new HomePage();  // Navigate to HomePage
+                dispose();  // Close current window
+            }
+        });
+
+        gbc.gridx = 5;
+        buttonPanel.add(logoutButton, gbc);
+
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         // Add the main panel to the frame and make it visible

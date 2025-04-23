@@ -119,6 +119,7 @@ public class StartPageStyle {
         label.setForeground(Color.WHITE);
     }
 
+
     public static void styleTable(JTable table) {
         table.setFont(new Font("SansSerif", Font.PLAIN, 14));
         table.setRowHeight(25);
