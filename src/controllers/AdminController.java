@@ -6,6 +6,9 @@ import database.MongoDBConnection;
 import models.AdminModel;
 import org.bson.Document;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AdminController {
     private static final String COLLECTION_NAME = "admins";
     private final MongoDatabase database;
@@ -30,6 +33,35 @@ public class AdminController {
             collection.insertOne(admin.toDocument());
             System.out.println("Admin registered successfully!");
             return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public List<AdminModel> getAllAdmins() {
+        List<AdminModel> admins = new ArrayList<>();
+        try {
+            MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
+
+            // Get all admin documents
+            for (Document doc : collection.find()) {
+                admins.add(new AdminModel(
+                        doc.getString("username"),
+                        "********" // Don't show actual passwords
+                ));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return admins;
+    }
+
+    public boolean deleteAdmin(String username) {
+        try {
+            MongoCollection<Document> collection = database.getCollection(COLLECTION_NAME);
+            Document result = collection.findOneAndDelete(new Document("username", username));
+            return result != null;
         } catch (Exception e) {
             e.printStackTrace();
             return false;

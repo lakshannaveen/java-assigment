@@ -2,7 +2,6 @@ package ui;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
@@ -59,17 +58,22 @@ public class AdminDashboard extends JFrame {
         // Buttons Panel
         JButton showLogsButton = new JButton("Show Logs");
         JButton accountsButton = new JButton("Accounts");
+        JButton adminsButton = new JButton("Manage Admins"); // New button
+
         AdminDashboardStyle.applyButtonStyle(showLogsButton);
         AdminDashboardStyle.applyButtonStyle(accountsButton);
+        AdminDashboardStyle.applyButtonStyle(adminsButton); // Style the new button
 
         JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.setOpaque(false);
         buttonPanel.add(showLogsButton);
         buttonPanel.add(accountsButton);
+        buttonPanel.add(adminsButton); // Add the new button
 
         mainPanel.add(buttonPanel, BorderLayout.CENTER);
         add(mainPanel);
 
+        // Action Listeners
         showLogsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -81,6 +85,14 @@ public class AdminDashboard extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new AdminUserAccounts();
+                dispose(); // Close the current frame
+            }
+        });
+
+        adminsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new AdminManage();
                 dispose(); // Close the current frame
             }
         });
@@ -230,4 +242,3 @@ public class AdminDashboard extends JFrame {
         });
     }
 }
-
