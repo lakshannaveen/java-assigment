@@ -1,83 +1,102 @@
 package ui;
 
-import java.awt.Color;
 import javax.swing.*;
-import java.awt.Font;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class RegisterPageStyle {
 
     public static void applyStyles(JPanel panel, JTextField nameField, JTextField emailField, JPasswordField passwordField, JButton registerButton, JButton backButton) {
-        // Set background color for the panel
-        panel.setBackground(new Color(245, 245, 245));
+        panel.setBackground(Color.WHITE);
 
-        // Style the text fields and password field
-        nameField.setFont(new Font("Arial", Font.PLAIN, 14));
-        nameField.setForeground(Color.GRAY);
-        nameField.setText("Enter Name");
-        nameField.setCaretColor(Color.BLACK); // Change caret color to black
-        nameField.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                if (nameField.getText().equals("Enter Name")) {
-                    nameField.setText("");
-                    nameField.setForeground(Color.BLACK);
-                }
-            }
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                if (nameField.getText().isEmpty()) {
-                    nameField.setText("Enter Name");
-                    nameField.setForeground(Color.GRAY);
-                }
-            }
-        });
+        Font placeholderFont = new Font("Segoe UI", Font.PLAIN, 13);
+        Color placeholderColor = Color.GRAY;
+        Color textColor = Color.BLACK;
 
-        emailField.setFont(new Font("Arial", Font.PLAIN, 14));
-        emailField.setForeground(Color.GRAY);
-        emailField.setText("Enter Email");
-        emailField.setCaretColor(Color.BLACK); // Change caret color to black
-        emailField.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                if (emailField.getText().equals("Enter Email")) {
-                    emailField.setText("");
-                    emailField.setForeground(Color.BLACK);
-                }
-            }
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                if (emailField.getText().isEmpty()) {
-                    emailField.setText("Enter Email");
-                    emailField.setForeground(Color.GRAY);
-                }
-            }
-        });
+        setupPlaceholder(nameField, "Enter Name", placeholderFont, placeholderColor, textColor);
+        setupPlaceholder(emailField, "Enter Email", placeholderFont, placeholderColor, textColor);
+        setupPasswordPlaceholder(passwordField, "Enter Password", placeholderFont, placeholderColor, textColor);
 
-        passwordField.setFont(new Font("Arial", Font.PLAIN, 14));
-        passwordField.setForeground(Color.GRAY);
-        passwordField.setEchoChar('*');
-        passwordField.setText("Enter Password");
-        passwordField.setCaretColor(Color.BLACK); // Change caret color to black
-        passwordField.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                if (String.valueOf(passwordField.getPassword()).equals("Enter Password")) {
-                    passwordField.setText("");
-                    passwordField.setForeground(Color.BLACK);
-                }
-            }
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                if (String.valueOf(passwordField.getPassword()).isEmpty()) {
-                    passwordField.setText("Enter Password");
-                    passwordField.setForeground(Color.GRAY);
-                }
-            }
-        });
+        // Register Button Styling
+        Color loginGreen = new Color(40, 167, 69);           // Same as login
+        Color loginGreenHover = new Color(33, 136, 56);      // Hover color
 
-        // Style the register button
-        registerButton.setBackground(new Color(0, 128, 0)); // Green color
+        registerButton.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        registerButton.setBackground(loginGreen);
         registerButton.setForeground(Color.WHITE);
-        registerButton.setFont(new Font("Arial", Font.BOLD, 14));
+        registerButton.setFocusPainted(false);
+        registerButton.setBorder(new EmptyBorder(8, 20, 8, 20));
+        registerButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        // Style the back button (left top as back icon)
-        backButton.setFont(new Font("Arial", Font.BOLD, 14));
-        backButton.setForeground(new Color(0, 128, 0)); // Green color
+        registerButton.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) {
+                registerButton.setBackground(loginGreenHover);
+            }
+
+            public void mouseExited(MouseEvent e) {
+                registerButton.setBackground(loginGreen);
+            }
+        });
+
+        // Back Button Styling
+        backButton.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        backButton.setForeground(loginGreen);
         backButton.setBorderPainted(false);
         backButton.setContentAreaFilled(false);
+        backButton.setFocusPainted(false);
+        backButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    }
+
+    private static void setupPlaceholder(JTextField field, String placeholder, Font font, Color placeholderColor, Color textColor) {
+        field.setFont(font);
+        field.setForeground(placeholderColor);
+        field.setText(placeholder);
+        field.setCaretColor(textColor);
+
+        field.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent e) {
+                if (field.getText().equals(placeholder)) {
+                    field.setText("");
+                    field.setForeground(textColor);
+                }
+            }
+
+            public void focusLost(FocusEvent e) {
+                if (field.getText().trim().isEmpty()) {
+                    field.setText(placeholder);
+                    field.setForeground(placeholderColor);
+                }
+            }
+        });
+    }
+
+    private static void setupPasswordPlaceholder(JPasswordField field, String placeholder, Font font, Color placeholderColor, Color textColor) {
+        field.setFont(font);
+        field.setForeground(placeholderColor);
+        field.setText(placeholder);
+        field.setEchoChar((char) 0); // Show text for placeholder
+        field.setCaretColor(textColor);
+
+        field.addFocusListener(new FocusAdapter() {
+            public void focusGained(FocusEvent e) {
+                if (String.valueOf(field.getPassword()).equals(placeholder)) {
+                    field.setText("");
+                    field.setForeground(textColor);
+                    field.setEchoChar('•'); // Use dot for password
+                }
+            }
+
+            public void focusLost(FocusEvent e) {
+                if (String.valueOf(field.getPassword()).trim().isEmpty()) {
+                    field.setText(placeholder);
+                    field.setForeground(placeholderColor);
+                    field.setEchoChar((char) 0); // Show placeholder again
+                }
+            }
+        });
     }
 }
