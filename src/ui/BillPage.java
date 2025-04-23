@@ -37,18 +37,19 @@ public class BillPage extends JFrame {
     }
 
     private void initializeUI() {
-        setTitle("Bill Management");
-        setSize(900, 700);
+        setTitle("My Storage Bill");
+        setSize(1200, 800); // Increased width and height
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(Color.WHITE);
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20)); // Added padding
 
         // Top panel with back button and title
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(Color.decode("#e0f7e9"));
-        topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        topPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         JButton backButton = new JButton("⬅ Back");
         backButton.setBackground(Color.decode("#81c784"));
@@ -60,8 +61,8 @@ public class BillPage extends JFrame {
         });
         topPanel.add(backButton, BorderLayout.WEST);
 
-        JLabel titleLabel = new JLabel("Bill Management", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        JLabel titleLabel = new JLabel("My Storage Bill", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 28)); // Larger font
         titleLabel.setForeground(Color.decode("#2e7d32"));
         topPanel.add(titleLabel, BorderLayout.CENTER);
 
@@ -72,40 +73,36 @@ public class BillPage extends JFrame {
         contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         contentPanel.setBackground(Color.WHITE);
 
-        // Upload section
-        JPanel uploadPanel = new JPanel();
-        uploadPanel.setLayout(new BoxLayout(uploadPanel, BoxLayout.Y_AXIS));
+        // Upload section - now in a horizontal layout
+        JPanel uploadPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         uploadPanel.setBorder(BorderFactory.createTitledBorder("Upload New Bill"));
         uploadPanel.setBackground(Color.WHITE);
-        uploadPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        uploadPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
 
         JButton selectButton = new JButton("Select Bill from Device");
         selectButton.setBackground(Color.decode("#42a5f5"));
         selectButton.setForeground(Color.WHITE);
         selectButton.setFocusPainted(false);
-        selectButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-        fileInfoLabel = new JLabel("No file selected");
-        fileInfoLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        selectButton.setPreferredSize(new Dimension(200, 30));
         selectButton.addActionListener(this::selectFile);
+
+        fileInfoLabel = new JLabel("No file selected");
+        fileInfoLabel.setPreferredSize(new Dimension(250, 30));
 
         JButton uploadButton = new JButton("Upload Selected Bill");
         uploadButton.setBackground(Color.decode("#66bb6a"));
         uploadButton.setForeground(Color.WHITE);
         uploadButton.setFocusPainted(false);
-        uploadButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+        uploadButton.setPreferredSize(new Dimension(200, 30));
         uploadButton.addActionListener(this::uploadFile);
 
-        uploadPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         uploadPanel.add(new JLabel("Select an image file (JPG, PNG):"));
-        uploadPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         uploadPanel.add(selectButton);
-        uploadPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         uploadPanel.add(fileInfoLabel);
-        uploadPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         uploadPanel.add(uploadButton);
 
         contentPanel.add(uploadPanel);
-        contentPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        contentPanel.add(Box.createRigidArea(new Dimension(0, 30))); // More space between sections
 
         // Bills list section
         JPanel billsListPanel = new JPanel(new BorderLayout());
@@ -117,15 +114,19 @@ public class BillPage extends JFrame {
         billsPanel.setBackground(Color.WHITE);
 
         JScrollPane scrollPane = new JScrollPane(billsPanel);
-        scrollPane.setPreferredSize(new Dimension(860, 400));
+        scrollPane.setPreferredSize(new Dimension(1100, 450)); // Wider scroll pane
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         billsListPanel.add(scrollPane, BorderLayout.CENTER);
 
+        JPanel refreshPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        refreshPanel.setBackground(Color.WHITE);
         JButton refreshButton = new JButton("Refresh Bills List");
         refreshButton.setBackground(Color.decode("#a5d6a7"));
         refreshButton.setFocusPainted(false);
+        refreshButton.setPreferredSize(new Dimension(200, 30));
         refreshButton.addActionListener(e -> refreshBillsList());
-        billsListPanel.add(refreshButton, BorderLayout.SOUTH);
+        refreshPanel.add(refreshButton);
+        billsListPanel.add(refreshPanel, BorderLayout.SOUTH);
 
         contentPanel.add(billsListPanel);
         mainPanel.add(contentPanel, BorderLayout.CENTER);
@@ -141,6 +142,7 @@ public class BillPage extends JFrame {
         if (bills.isEmpty()) {
             JLabel noBillsLabel = new JLabel("No bills uploaded yet");
             noBillsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            noBillsLabel.setFont(new Font("Arial", Font.PLAIN, 16));
             billsPanel.add(noBillsLabel);
         } else {
             for (BillModel bill : bills) {
@@ -148,20 +150,21 @@ public class BillPage extends JFrame {
                 JPanel cardPanel = new JPanel(new BorderLayout(10, 10));
                 cardPanel.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(Color.LIGHT_GRAY),
-                        BorderFactory.createEmptyBorder(10, 10, 10, 10)
+                        BorderFactory.createEmptyBorder(15, 15, 15, 15)
                 ));
                 cardPanel.setBackground(Color.WHITE);
-                cardPanel.setMaximumSize(new Dimension(800, 200));
+                cardPanel.setMaximumSize(new Dimension(1100, 200)); // Wider cards
 
                 // Image preview
                 JLabel imageLabel = new JLabel();
                 try {
                     ImageIcon imageIcon = new ImageIcon(bill.getFilePath());
-                    Image scaledImg = imageIcon.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
+                    Image scaledImg = imageIcon.getImage().getScaledInstance(180, 180, Image.SCALE_SMOOTH); // Larger preview
                     imageLabel.setIcon(new ImageIcon(scaledImg));
                     imageLabel.setHorizontalAlignment(JLabel.CENTER);
                 } catch (Exception e) {
                     imageLabel.setText("Image not available");
+                    imageLabel.setFont(new Font("Arial", Font.PLAIN, 14));
                 }
                 cardPanel.add(imageLabel, BorderLayout.WEST);
 
@@ -169,21 +172,24 @@ public class BillPage extends JFrame {
                 JPanel infoPanel = new JPanel(new BorderLayout());
                 infoPanel.setBackground(Color.WHITE);
 
-                JLabel billLabel = new JLabel("<html><b>" + bill.getFileName() + "</b><br>"
-                        + "<small>Uploaded: " + bill.getUploadDate() + "</small></html>");
+                JLabel billLabel = new JLabel("<html><div style='width:600px;'><b>" + bill.getFileName() + "</b><br>"
+                        + "<small>Uploaded: " + bill.getUploadDate() + "</small></div></html>");
+                billLabel.setFont(new Font("Arial", Font.PLAIN, 16));
                 infoPanel.add(billLabel, BorderLayout.NORTH);
 
                 // Buttons panel
-                JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 5));
+                JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 5));
                 buttonsPanel.setBackground(Color.WHITE);
 
                 // Download button
                 JButton downloadButton = createStyledButton("Download", "#42a5f5", "#1e88e5");
+                downloadButton.setPreferredSize(new Dimension(120, 30));
                 downloadButton.addActionListener(e -> downloadBill(bill));
                 buttonsPanel.add(downloadButton);
 
                 // Delete button
                 JButton deleteButton = createStyledButton("Delete", "#ef5350", "#e53935");
+                deleteButton.setPreferredSize(new Dimension(120, 30));
                 deleteButton.addActionListener(e -> {
                     if (JOptionPane.showConfirmDialog(this,
                             "Are you sure you want to delete this bill?",
@@ -204,7 +210,7 @@ public class BillPage extends JFrame {
                 cardPanel.add(infoPanel, BorderLayout.CENTER);
 
                 billsPanel.add(cardPanel);
-                billsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+                billsPanel.add(Box.createRigidArea(new Dimension(0, 15))); // More space between cards
             }
         }
 
