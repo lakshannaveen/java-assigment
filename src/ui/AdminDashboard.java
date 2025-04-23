@@ -7,7 +7,7 @@ import org.jfree.chart.plot.*;
 import org.jfree.data.category.*;
 import javax.swing.*;
 import org.jfree.chart.renderer.category.BarRenderer;
-import javax.swing.Timer; // Explicitly using Swing Timer
+import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
@@ -51,7 +51,6 @@ public class AdminDashboard extends JFrame {
         clockPanel.add(clockLabel);
         mainPanel.add(clockPanel, BorderLayout.SOUTH);
 
-        // Using javax.swing.Timer explicitly
         Timer timer = new Timer(1000, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -61,14 +60,13 @@ public class AdminDashboard extends JFrame {
         });
         timer.start();
 
-        // Buttons
+        // Buttons - Removed the showChartButton
         JButton showLogsButton = new JButton("Show Logs");
         JButton accountsButton = new JButton("Accounts");
         JButton adminsButton = new JButton("Manage Admins");
         JButton logoutButton = new JButton("Logout");
-        JButton showChartButton = new JButton("Login Analysis");
 
-        JButton[] buttons = {showLogsButton, accountsButton, adminsButton, showChartButton, logoutButton};
+        JButton[] buttons = {showLogsButton, accountsButton, adminsButton, logoutButton};
 
         for (JButton button : buttons) {
             AdminDashboardStyle.applyButtonStyle(button);
@@ -83,7 +81,7 @@ public class AdminDashboard extends JFrame {
 
         mainPanel.add(buttonPanel, BorderLayout.NORTH);
 
-        // Add default chart panel to center
+        // Add chart panel to center by default
         JPanel chartPanel = createLoginTimeChartPanel();
         mainPanel.add(chartPanel, BorderLayout.CENTER);
 
@@ -101,13 +99,6 @@ public class AdminDashboard extends JFrame {
         logoutButton.addActionListener(e -> {
             new HomePage();
             dispose();
-        });
-        showChartButton.addActionListener(e -> {
-            JPanel newChartPanel = createLoginTimeChartPanel();
-            mainPanel.remove(1); // Remove the center component
-            mainPanel.add(newChartPanel, BorderLayout.CENTER);
-            mainPanel.revalidate();
-            mainPanel.repaint();
         });
 
         AdminDashboardStyle.applyFrameStyle(this);
@@ -153,19 +144,6 @@ public class AdminDashboard extends JFrame {
         panel.setOpaque(false);
         panel.add(chartPanel, BorderLayout.CENTER);
 
-        // Add refresh button
-        JButton refreshButton = new JButton("Refresh Chart");
-        AdminDashboardStyle.applyButtonStyle(refreshButton);
-        refreshButton.addActionListener(e -> {
-            JPanel newChartPanel = createLoginTimeChartPanel();
-            panel.removeAll();
-            panel.add(newChartPanel, BorderLayout.CENTER);
-            panel.add(refreshButton, BorderLayout.SOUTH);
-            panel.revalidate();
-            panel.repaint();
-        });
-
-        panel.add(refreshButton, BorderLayout.SOUTH);
         return panel;
     }
 
