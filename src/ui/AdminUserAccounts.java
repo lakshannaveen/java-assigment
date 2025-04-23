@@ -25,8 +25,8 @@ public class AdminUserAccounts extends JFrame {
 
         // Label for the title
         JLabel accountsLabel = new JLabel("User Accounts", SwingConstants.CENTER);
-        AdminUserAccountsStyle.applyStyle(accountsLabel); // Apply label style
-        accountsLabel.setFont(new Font("Arial", Font.BOLD, 18)); // Set font size and bold
+        AdminUserAccountsStyle.applyModernStyle(accountsLabel); // Apply modern label style
+        accountsLabel.setFont(new Font("Segoe UI", Font.BOLD, 24)); // Set modern font style
         accountsLabel.setForeground(new Color(30, 144, 255)); // Set color for title (blue)
         add(accountsLabel, BorderLayout.NORTH);
 
@@ -39,7 +39,7 @@ public class AdminUserAccounts extends JFrame {
             }
         };
         JTable table = new JTable(tableModel);
-        AdminUserAccountsStyle.applyTableStyle(table); // Apply custom table styles
+        AdminUserAccountsStyle.applyModernTableStyle(table); // Apply modern table styles
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);
 
@@ -52,7 +52,7 @@ public class AdminUserAccounts extends JFrame {
 
         // Back button to return to AdminDashboard
         JButton backButton = new JButton("Back");
-        AdminUserAccountsStyle.applyButtonStyle(backButton); // Apply button styles
+        AdminUserAccountsStyle.applyModernButtonStyle(backButton); // Apply modern button styles
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
