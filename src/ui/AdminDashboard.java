@@ -45,9 +45,7 @@ public class AdminDashboard extends JFrame {
         clockPanel.add(clockLabel);
         mainPanel.add(clockPanel, BorderLayout.SOUTH);
 
-        // Set the clock to update every second
         Timer timer = new Timer(1000, new ActionListener() {
-            @Override
             public void actionPerformed(ActionEvent e) {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String currentDateTime = dateFormat.format(new Date());
@@ -56,45 +54,40 @@ public class AdminDashboard extends JFrame {
         });
         timer.start();
 
-        // Buttons Panel
+        // Buttons
         JButton showLogsButton = new JButton("Show Logs");
         JButton accountsButton = new JButton("Accounts");
         JButton adminsButton = new JButton("Manage Admins");
+        JButton logoutButton = new JButton("Logout");
 
-        AdminDashboardStyle.applyButtonStyle(showLogsButton);
-        AdminDashboardStyle.applyButtonStyle(accountsButton);
-        AdminDashboardStyle.applyButtonStyle(adminsButton);
+        JButton[] buttons = {showLogsButton, accountsButton, adminsButton, logoutButton};
+
+        for (JButton button : buttons) {
+            AdminDashboardStyle.applyButtonStyle(button);
+            button.setPreferredSize(new Dimension(150, 40));
+        }
 
         JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.setOpaque(false);
-        buttonPanel.add(showLogsButton);
-        buttonPanel.add(accountsButton);
-        buttonPanel.add(adminsButton);
+        for (JButton button : buttons) {
+            buttonPanel.add(button);
+        }
 
         mainPanel.add(buttonPanel, BorderLayout.CENTER);
         add(mainPanel);
 
-        showLogsButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showLogs();
-            }
+        showLogsButton.addActionListener(e -> showLogs());
+        accountsButton.addActionListener(e -> {
+            new AdminUserAccounts();
+            dispose();
         });
-
-        accountsButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new AdminUserAccounts();
-                dispose();
-            }
+        adminsButton.addActionListener(e -> {
+            new AdminManage();
+            dispose();
         });
-
-        adminsButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new AdminManage();
-                dispose();
-            }
+        logoutButton.addActionListener(e -> {
+            new HomePage();
+            dispose();
         });
 
         AdminDashboardStyle.applyFrameStyle(this);
@@ -104,11 +97,11 @@ public class AdminDashboard extends JFrame {
     private void showLogs() {
         String[] columnNames = {"Event", "UserType", "Username", "Time"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0) {
-            @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
+
         JTable table = new JTable(tableModel);
         JTableHeader header = table.getTableHeader();
         header.setBackground(new Color(173, 216, 230));
@@ -146,15 +139,12 @@ public class AdminDashboard extends JFrame {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton downloadPdfButton = new JButton("Download PDF");
 
-        downloadPdfButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    downloadLogsAsPdf();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(AdminDashboard.this, "Failed to download PDF.", "Error", JOptionPane.ERROR_MESSAGE);
-                }
+        downloadPdfButton.addActionListener(e -> {
+            try {
+                downloadLogsAsPdf();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Failed to download PDF.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -169,7 +159,6 @@ public class AdminDashboard extends JFrame {
         PdfWriter.getInstance(document, new FileOutputStream("logs.pdf"));
         document.open();
 
-        // Use the iText PDF Font explicitly (com.itextpdf.text.Font)
         com.itextpdf.text.Font font = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 12, com.itextpdf.text.Font.BOLD);
         Paragraph title = new Paragraph("Log Contents", font);
         title.setAlignment(Element.ALIGN_CENTER);
@@ -215,11 +204,6 @@ public class AdminDashboard extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new AdminDashboard();
-            }
-        });
+        SwingUtilities.invokeLater(() -> new AdminDashboard());
     }
 }
