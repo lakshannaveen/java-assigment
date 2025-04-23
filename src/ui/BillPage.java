@@ -38,7 +38,7 @@ public class BillPage extends JFrame {
 
     private void initializeUI() {
         setTitle("Bill Management");
-        setSize(800, 600);
+        setSize(900, 700);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -47,10 +47,13 @@ public class BillPage extends JFrame {
 
         // Top panel with back button and title
         JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(Color.decode("#e0f7e9")); // light green
+        topPanel.setBackground(Color.decode("#e0f7e9"));
+        topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
         JButton backButton = new JButton("⬅ Back");
         backButton.setBackground(Color.decode("#81c784"));
         backButton.setForeground(Color.WHITE);
+        backButton.setFocusPainted(false);
         backButton.addActionListener(e -> {
             new StartPage(token);
             dispose();
@@ -58,7 +61,7 @@ public class BillPage extends JFrame {
         topPanel.add(backButton, BorderLayout.WEST);
 
         JLabel titleLabel = new JLabel("Bill Management", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Serif", Font.BOLD, 24));
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         titleLabel.setForeground(Color.decode("#2e7d32"));
         topPanel.add(titleLabel, BorderLayout.CENTER);
 
@@ -67,40 +70,64 @@ public class BillPage extends JFrame {
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        contentPanel.setBackground(Color.WHITE);
 
-        JButton uploadButton = new JButton("Select Bill File");
+        // Upload section
+        JPanel uploadPanel = new JPanel();
+        uploadPanel.setLayout(new BoxLayout(uploadPanel, BoxLayout.Y_AXIS));
+        uploadPanel.setBorder(BorderFactory.createTitledBorder("Upload New Bill"));
+        uploadPanel.setBackground(Color.WHITE);
+        uploadPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JButton selectButton = new JButton("Select Bill from Device");
+        selectButton.setBackground(Color.decode("#42a5f5"));
+        selectButton.setForeground(Color.WHITE);
+        selectButton.setFocusPainted(false);
+        selectButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         fileInfoLabel = new JLabel("No file selected");
-        fileInfoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        uploadButton.addActionListener(this::selectFile);
+        fileInfoLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        selectButton.addActionListener(this::selectFile);
 
-        JButton saveButton = new JButton("Upload Bill");
-        saveButton.setBackground(Color.decode("#66bb6a"));
-        saveButton.setForeground(Color.WHITE);
-        saveButton.addActionListener(this::uploadFile);
+        JButton uploadButton = new JButton("Upload Selected Bill");
+        uploadButton.setBackground(Color.decode("#66bb6a"));
+        uploadButton.setForeground(Color.WHITE);
+        uploadButton.setFocusPainted(false);
+        uploadButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+        uploadButton.addActionListener(this::uploadFile);
 
-        JButton refreshButton = new JButton("🔄 Refresh");
-        refreshButton.setBackground(Color.decode("#a5d6a7"));
-        refreshButton.addActionListener(e -> refreshBillsList());
+        uploadPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        uploadPanel.add(new JLabel("Select an image file (JPG, PNG):"));
+        uploadPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        uploadPanel.add(selectButton);
+        uploadPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        uploadPanel.add(fileInfoLabel);
+        uploadPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        uploadPanel.add(uploadButton);
 
-        contentPanel.add(new JLabel("Upload your bill (JPG, PNG only):"));
-        contentPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        contentPanel.add(uploadButton);
-        contentPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        contentPanel.add(fileInfoLabel);
-        contentPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        contentPanel.add(saveButton);
-        contentPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        contentPanel.add(refreshButton);
+        contentPanel.add(uploadPanel);
+        contentPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        // Bills list section
+        JPanel billsListPanel = new JPanel(new BorderLayout());
+        billsListPanel.setBorder(BorderFactory.createTitledBorder("Your Bills"));
+        billsListPanel.setBackground(Color.WHITE);
 
         billsPanel = new JPanel();
         billsPanel.setLayout(new BoxLayout(billsPanel, BoxLayout.Y_AXIS));
-        billsPanel.setBorder(BorderFactory.createTitledBorder("Your Bills"));
+        billsPanel.setBackground(Color.WHITE);
 
         JScrollPane scrollPane = new JScrollPane(billsPanel);
-        scrollPane.setPreferredSize(new Dimension(760, 300));
-        contentPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-        contentPanel.add(scrollPane);
+        scrollPane.setPreferredSize(new Dimension(860, 400));
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        billsListPanel.add(scrollPane, BorderLayout.CENTER);
 
+        JButton refreshButton = new JButton("Refresh Bills List");
+        refreshButton.setBackground(Color.decode("#a5d6a7"));
+        refreshButton.setFocusPainted(false);
+        refreshButton.addActionListener(e -> refreshBillsList());
+        billsListPanel.add(refreshButton, BorderLayout.SOUTH);
+
+        contentPanel.add(billsListPanel);
         mainPanel.add(contentPanel, BorderLayout.CENTER);
         add(mainPanel);
         refreshBillsList();
@@ -112,51 +139,72 @@ public class BillPage extends JFrame {
         List<BillModel> bills = billController.getBillsByUserEmail(userEmail);
 
         if (bills.isEmpty()) {
-            billsPanel.add(new JLabel("No bills uploaded yet"));
+            JLabel noBillsLabel = new JLabel("No bills uploaded yet");
+            noBillsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            billsPanel.add(noBillsLabel);
         } else {
             for (BillModel bill : bills) {
-                JPanel billPanel = new JPanel(new BorderLayout());
-                billPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+                // Create card panel
+                JPanel cardPanel = new JPanel(new BorderLayout(10, 10));
+                cardPanel.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(Color.LIGHT_GRAY),
+                        BorderFactory.createEmptyBorder(10, 10, 10, 10)
+                ));
+                cardPanel.setBackground(Color.WHITE);
+                cardPanel.setMaximumSize(new Dimension(800, 200));
 
-                // Image Preview
+                // Image preview
                 JLabel imageLabel = new JLabel();
-                ImageIcon imageIcon = new ImageIcon(bill.getFilePath());
-                Image scaledImg = imageIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
-                imageLabel.setIcon(new ImageIcon(scaledImg));
+                try {
+                    ImageIcon imageIcon = new ImageIcon(bill.getFilePath());
+                    Image scaledImg = imageIcon.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
+                    imageLabel.setIcon(new ImageIcon(scaledImg));
+                    imageLabel.setHorizontalAlignment(JLabel.CENTER);
+                } catch (Exception e) {
+                    imageLabel.setText("Image not available");
+                }
+                cardPanel.add(imageLabel, BorderLayout.WEST);
 
-                billPanel.add(imageLabel, BorderLayout.WEST);
+                // Bill info panel
+                JPanel infoPanel = new JPanel(new BorderLayout());
+                infoPanel.setBackground(Color.WHITE);
 
-                JLabel billLabel = new JLabel("<html><b>" + bill.getFileName() + "</b><br>" + bill.getUploadDate() + "</html>");
-                billPanel.add(billLabel, BorderLayout.CENTER);
+                JLabel billLabel = new JLabel("<html><b>" + bill.getFileName() + "</b><br>"
+                        + "<small>Uploaded: " + bill.getUploadDate() + "</small></html>");
+                infoPanel.add(billLabel, BorderLayout.NORTH);
 
-                JButton deleteButton = new JButton("Delete");
-                deleteButton.setBackground(Color.decode("#ef5350"));
-                deleteButton.setForeground(Color.WHITE);
-                deleteButton.setFocusPainted(false);
-                deleteButton.setOpaque(true);
-                deleteButton.setBorderPainted(false);
-                deleteButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                deleteButton.addMouseListener(new java.awt.event.MouseAdapter() {
-                    public void mouseEntered(java.awt.event.MouseEvent evt) {
-                        deleteButton.setBackground(Color.decode("#e53935"));
-                    }
+                // Buttons panel
+                JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 5));
+                buttonsPanel.setBackground(Color.WHITE);
 
-                    public void mouseExited(java.awt.event.MouseEvent evt) {
-                        deleteButton.setBackground(Color.decode("#ef5350"));
-                    }
-                });
+                // Download button
+                JButton downloadButton = createStyledButton("Download", "#42a5f5", "#1e88e5");
+                downloadButton.addActionListener(e -> downloadBill(bill));
+                buttonsPanel.add(downloadButton);
+
+                // Delete button
+                JButton deleteButton = createStyledButton("Delete", "#ef5350", "#e53935");
                 deleteButton.addActionListener(e -> {
-                    if (billController.deleteBill(bill.getId())) {
-                        refreshBillsList();
-                        JOptionPane.showMessageDialog(this, "Bill deleted successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Failed to delete bill", "Error", JOptionPane.ERROR_MESSAGE);
+                    if (JOptionPane.showConfirmDialog(this,
+                            "Are you sure you want to delete this bill?",
+                            "Confirm Delete",
+                            JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+
+                        if (billController.deleteBill(bill.getId())) {
+                            refreshBillsList();
+                            JOptionPane.showMessageDialog(this, "Bill deleted successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Failed to delete bill", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
                     }
                 });
+                buttonsPanel.add(deleteButton);
 
-                billPanel.add(deleteButton, BorderLayout.EAST);
-                billsPanel.add(billPanel);
-                billsPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+                infoPanel.add(buttonsPanel, BorderLayout.SOUTH);
+                cardPanel.add(infoPanel, BorderLayout.CENTER);
+
+                billsPanel.add(cardPanel);
+                billsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
             }
         }
 
@@ -164,8 +212,47 @@ public class BillPage extends JFrame {
         billsPanel.repaint();
     }
 
+    private JButton createStyledButton(String text, String bgColor, String hoverColor) {
+        JButton button = new JButton(text);
+        button.setBackground(Color.decode(bgColor));
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setOpaque(true);
+        button.setBorderPainted(false);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(Color.decode(hoverColor));
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(Color.decode(bgColor));
+            }
+        });
+        return button;
+    }
+
+    private void downloadBill(BillModel bill) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Save Bill As");
+        fileChooser.setSelectedFile(new File(bill.getFileName()));
+
+        int userSelection = fileChooser.showSaveDialog(this);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File fileToSave = fileChooser.getSelectedFile();
+            try {
+                Files.copy(Paths.get(bill.getFilePath()), fileToSave.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                JOptionPane.showMessageDialog(this, "Bill downloaded successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(this, "Error downloading file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
+            }
+        }
+    }
+
     private void selectFile(ActionEvent e) {
         JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Select Bill Image");
         fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
             @Override
             public boolean accept(File f) {
