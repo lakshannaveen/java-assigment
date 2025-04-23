@@ -45,7 +45,7 @@ public class Report extends JFrame {
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(Color.BLACK);
 
-        JButton backButton = new JButton("← Back");
+        JButton backButton = new JButton("Back");
         backButton.setBackground(Color.BLACK);
         backButton.setForeground(Color.WHITE);
         backButton.setFont(new Font("Segoe UI", Font.BOLD, 14));

@@ -57,7 +57,7 @@ public class BillPage extends JFrame {
         topPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         // White back button with black text
-        JButton backButton = new JButton("⬅ Back");
+        JButton backButton = new JButton("Back");
         backButton.setBackground(Color.black);
         backButton.setForeground(Color.white);
         backButton.setFont(new Font("Arial", Font.BOLD, 14));
@@ -69,7 +69,7 @@ public class BillPage extends JFrame {
         });
         topPanel.add(backButton, BorderLayout.WEST);
 
-        JLabel titleLabel = new JLabel("My Storage Bill", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("My Bill Storage", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
         titleLabel.setForeground(Color.WHITE); // White text on black background
         topPanel.add(titleLabel, BorderLayout.CENTER);
