@@ -119,7 +119,6 @@ public class StartPageStyle {
         label.setForeground(Color.WHITE);
     }
 
-
     public static void styleTable(JTable table) {
         table.setFont(new Font("SansSerif", Font.PLAIN, 14));
         table.setRowHeight(25);
@@ -128,7 +127,7 @@ public class StartPageStyle {
 
         JTableHeader header = table.getTableHeader();
         header.setFont(new Font("SansSerif", Font.BOLD, 14));
-        header.setBackground(new Color(34, 139, 34));
+        header.setBackground(Color.BLACK); 
         header.setForeground(Color.WHITE);
 
         for (int i = 0; i < table.getColumnCount(); i++) {
