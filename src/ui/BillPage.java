@@ -51,12 +51,18 @@ public class BillPage extends JFrame {
         mainPanel.setBackground(Color.WHITE);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
 
-        // Top panel with back button and title
+        // Top panel with back button and title - changed to black background
         JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(Color.decode("#1b5e20")); // Darker green
+        topPanel.setBackground(Color.BLACK); // Changed to black
         topPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        JButton backButton = createStyledButton("⬅ Back", "#2e7d32", "#1b5e20", "#4c8c4a");
+        // White back button with black text
+        JButton backButton = new JButton("⬅ Back");
+        backButton.setBackground(Color.WHITE);
+        backButton.setForeground(Color.BLACK);
+        backButton.setFont(new Font("Arial", Font.BOLD, 14));
+        backButton.setFocusPainted(false);
+        backButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         backButton.addActionListener(e -> {
             new StartPage(token);
             dispose();
@@ -65,7 +71,7 @@ public class BillPage extends JFrame {
 
         JLabel titleLabel = new JLabel("My Storage Bill", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
-        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setForeground(Color.WHITE); // White text on black background
         topPanel.add(titleLabel, BorderLayout.CENTER);
 
         mainPanel.add(topPanel, BorderLayout.NORTH);
