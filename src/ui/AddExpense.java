@@ -9,8 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.time.LocalDate;
-import java.time.YearMonth;
+import java.time.*;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -38,12 +37,9 @@ public class AddExpense extends JFrame {
 
         JButton backButton = new JButton("Back");
         AddExpenseStyle.styleButton(backButton);
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new StartPage(token);
-                dispose();
-            }
+        backButton.addActionListener(e -> {
+            new StartPage(token);
+            dispose();
         });
 
         JPanel backButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -83,12 +79,9 @@ public class AddExpense extends JFrame {
 
         JButton submitButton = new JButton("Submit");
         AddExpenseStyle.styleButton(submitButton);
-        submitButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                clearPlaceholders();
-                validateAndSubmitForm();
-            }
+        submitButton.addActionListener(e -> {
+            clearPlaceholders();
+            validateAndSubmitForm();
         });
 
         JPanel submitButtonPanel = new JPanel();
@@ -119,12 +112,7 @@ public class AddExpense extends JFrame {
         ((SpinnerDateModel) dateSpinner.getModel()).setStart(startDate);
         ((SpinnerDateModel) dateSpinner.getModel()).setEnd(endDate);
 
-        // Set current date, if within the range of the selected month
-        if (now.getDayOfMonth() >= 1 && now.getDayOfMonth() <= calendar.getActualMaximum(Calendar.DAY_OF_MONTH)) {
-            dateSpinner.setValue(Date.from(now.atStartOfDay(calendar.getTimeZone().toZoneId()).toInstant()));
-        } else {
-            dateSpinner.setValue(startDate);
-        }
+        dateSpinner.setValue(new Date());
     }
 
     private void clearPlaceholders() {
@@ -156,40 +144,42 @@ public class AddExpense extends JFrame {
         String email = getEmailFromToken(token);
 
         if (selectedMonth == null) {
-            JOptionPane.showMessageDialog(null, "Month selection is required", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            showError("Month selection is required");
             return;
         }
-
         if (expenseName.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Expense Name is required", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            showError("Expense Name is required");
             return;
         }
-
         if (amountText.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Amount is required", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            showError("Amount is required");
             return;
         }
 
-        double amount = 0;
+        double amount;
         try {
             amount = Double.parseDouble(amountText);
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Invalid amount", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            showError("Invalid amount");
             return;
         }
 
-        ExpenseModel expense = new ExpenseModel(pocketName, selectedMonth, expenseName, amount, selectedDate, email);
-        expenseController.addExpense(expense);
+        // Attach time
+        LocalDate selectedLocalDate = selectedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalTime currentTime = LocalTime.now();
+        LocalDateTime fullDateTime = LocalDateTime.of(selectedLocalDate, currentTime);
+        Date finalDateWithTime = Date.from(fullDateTime.atZone(ZoneId.systemDefault()).toInstant());
 
+        ExpenseModel expense = new ExpenseModel(pocketName, selectedMonth, expenseName, amount, finalDateWithTime, email);
+        expenseController.addExpense(expense);
         JOptionPane.showMessageDialog(null, "Expense added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    private void showError(String message) {
+        JOptionPane.showMessageDialog(null, message, "Validation Error", JOptionPane.ERROR_MESSAGE);
+    }
+
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new AddExpense("token", "DefaultPocketName");
-            }
-        });
+        SwingUtilities.invokeLater(() -> new AddExpense("token", "DefaultPocketName"));
     }
 }
