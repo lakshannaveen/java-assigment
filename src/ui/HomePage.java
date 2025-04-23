@@ -2,6 +2,7 @@ package ui;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -13,6 +14,10 @@ public class HomePage extends JFrame {
     private JButton registerButton;
     private JComboBox<String> languageComboBox;
     private static Locale currentLocale = Locale.ENGLISH;
+
+    private String fullWelcomeText = "Welcome to Expense Tracker";
+    private int welcomeTextIndex = 0;
+    private Timer typingTimer;
 
     public HomePage() {
         try {
@@ -34,19 +39,17 @@ public class HomePage extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Create components
         GradientPanel mainPanel = new GradientPanel();
         mainPanel.setLayout(new BorderLayout());
 
         titleLabel = new JLabel(bundle.getString("title"), JLabel.CENTER);
-        welcomeLabel = new JLabel(bundle.getString("welcome"), JLabel.CENTER);
+        welcomeLabel = new JLabel("", JLabel.CENTER); // Start empty for animation
         loginButton = new JButton(bundle.getString("login"));
         registerButton = new JButton(bundle.getString("register"));
 
         loginButton.setPreferredSize(new Dimension(150, 40));
         registerButton.setPreferredSize(new Dimension(150, 40));
 
-        // Language selection
         String[] languages = {"English", "Singlish"};
         languageComboBox = new JComboBox<>(languages);
         languageComboBox.setSelectedItem(currentLocale.equals(new Locale("si")) ? "Singlish" : "English");
@@ -96,16 +99,45 @@ public class HomePage extends JFrame {
 
         add(mainPanel);
         setVisible(true);
+
+        startTypingAnimation();
+    }
+
+    private void startTypingAnimation() {
+        fullWelcomeText = bundle.getString("welcome");
+        welcomeLabel.setText("");
+        welcomeLabel.setFont(new Font("Arial", Font.PLAIN, 18));
+        welcomeLabel.setForeground(Color.DARK_GRAY);
+        welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+        welcomeTextIndex = 0;
+
+        if (typingTimer != null && typingTimer.isRunning()) {
+            typingTimer.stop();
+        }
+
+        typingTimer = new Timer(100, e -> {
+            if (welcomeTextIndex < fullWelcomeText.length()) {
+                welcomeLabel.setText(welcomeLabel.getText() + fullWelcomeText.charAt(welcomeTextIndex));
+                welcomeTextIndex++;
+            } else {
+                ((Timer) e.getSource()).stop();
+            }
+        });
+
+        typingTimer.setInitialDelay(300); // delay before typing starts
+        typingTimer.start();
     }
 
     private void updateTexts() {
         try {
             setTitle(bundle.getString("title"));
             titleLabel.setText(bundle.getString("title"));
-            welcomeLabel.setText(bundle.getString("welcome"));
             loginButton.setText(bundle.getString("login"));
             registerButton.setText(bundle.getString("register"));
             ((JLabel) ((JPanel) languageComboBox.getParent()).getComponent(0)).setText(bundle.getString("language") + ": ");
+
+            startTypingAnimation(); // restart typing with new language
         } catch (Exception e) {
             e.printStackTrace();
         }
