@@ -19,99 +19,112 @@ import java.io.FileOutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.time.Day;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
 
 public class Report extends JFrame {
     private String token;
     private ExpenseController expenseController;
 
     public Report(String token) {
-        this.token = token; // Store the token
+        this.token = token;
         this.expenseController = new ExpenseController();
 
-        // Set the JFrame properties
         setTitle("Report Page");
-        setSize(800, 600); // Adjusted size for better visibility
+        setSize(1000, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Main panel setup with padding and alignment adjustments
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Welcome label with improved styling
         JLabel welcomeLabel = new JLabel("Welcome to the Report Page!", SwingConstants.CENTER);
-        welcomeLabel.setFont(new Font("Serif", Font.BOLD, 24));
-        welcomeLabel.setForeground(Color.DARK_GRAY);  // Set color to dark gray for contrast
+        welcomeLabel.setFont(new java.awt.Font("Serif", java.awt.Font.BOLD, 24));
+        welcomeLabel.setForeground(Color.DARK_GRAY);
         mainPanel.add(welcomeLabel, BorderLayout.NORTH);
 
-        // Fetch and display pocket names with download buttons
         JPanel pocketPanel = new JPanel();
         pocketPanel.setLayout(new BoxLayout(pocketPanel, BoxLayout.Y_AXIS));
-        pocketPanel.setBackground(new Color(245, 245, 245));  // Light gray background for pocket panel
+        pocketPanel.setBackground(new Color(245, 245, 245));
 
         String email = getEmailFromToken(token);
         List<ExpenseModel> expenses = expenseController.getExpensesByEmail(email);
 
-        // Group expenses by pocket name
         Map<String, List<ExpenseModel>> expensesByPocketName = expenses.stream()
                 .collect(Collectors.groupingBy(ExpenseModel::getPocketName));
 
-        // Adjusted spacing and alignment for each pocket name and its button
         for (String pocketName : expensesByPocketName.keySet()) {
-            JPanel pocketRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));  // Spaced components for clarity
-            pocketRow.setBackground(new Color(245, 245, 245));  // Ensure consistency in background
+            JPanel pocketRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
+            pocketRow.setBackground(new Color(245, 245, 245));
 
             JLabel pocketLabel = new JLabel(pocketName);
-            pocketLabel.setFont(new Font("Serif", Font.BOLD, 18));
-            pocketLabel.setPreferredSize(new Dimension(300, 30));  // Control the width for better alignment
+            pocketLabel.setFont(new java.awt.Font("Serif", java.awt.Font.BOLD, 18));
+            pocketLabel.setPreferredSize(new Dimension(300, 30));
             pocketRow.add(pocketLabel);
 
             JButton downloadButton = new JButton("Download");
             ReportStyle.styleBlueButton(downloadButton);
-            downloadButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    downloadReport(email, pocketName, expensesByPocketName.get(pocketName));
-                }
-            });
+            downloadButton.addActionListener(e -> downloadReport(email, pocketName, expensesByPocketName.get(pocketName)));
             pocketRow.add(downloadButton);
 
             pocketPanel.add(pocketRow);
         }
 
         JScrollPane scrollPane = new JScrollPane(pocketPanel);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Add padding around the scrollPane
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
-        // Back button with improved styling
+        // Chart Panel
+        JPanel chartPanel = new JPanel(new BorderLayout());
+        chartPanel.setPreferredSize(new Dimension(1000, 300));
+        chartPanel.setBorder(BorderFactory.createTitledBorder("Expenses Over Time"));
+
+        TimeSeries series = new TimeSeries("All Expenses");
+
+        for (ExpenseModel expense : expenses) {
+            series.addOrUpdate(new Day(expense.getDate()), expense.getAmount());
+        }
+
+        TimeSeriesCollection dataset = new TimeSeriesCollection(series);
+        JFreeChart chart = ChartFactory.createTimeSeriesChart(
+                "All User Expenses",
+                "Date",
+                "Amount",
+                dataset,
+                false, true, false
+        );
+
+        ChartPanel jChartPanel = new ChartPanel(chart);
+        chartPanel.add(jChartPanel, BorderLayout.CENTER);
+        mainPanel.add(chartPanel, BorderLayout.NORTH);
+
         JButton backButton = new JButton("Back");
         ReportStyle.styleGreenButton(backButton);
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new StartPage(token);  // Navigate back to StartPage with token
-                dispose();  // Close current window
-            }
+        backButton.addActionListener(e -> {
+            new StartPage(token);
+            dispose();
         });
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        buttonPanel.setBackground(Color.WHITE);  // Ensure the button panel has a clean background
+        buttonPanel.setBackground(Color.WHITE);
         buttonPanel.add(backButton);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
-        // Add the main panel to the frame and make it visible
         add(mainPanel);
         setVisible(true);
     }
 
     private String getEmailFromToken(String token) {
         try {
-            // Decode JWT token to get the email claim
             DecodedJWT decodedJWT = JWT.decode(token);
             return decodedJWT.getClaim("email").asString();
         } catch (Exception e) {
             e.printStackTrace();
-            return null;  // Return null if there is any error decoding the token
+            return null;
         }
     }
 
@@ -123,9 +136,9 @@ public class Report extends JFrame {
             document.open();
             document.add(new Paragraph("Report for Pocket: " + pocketName));
             document.add(new Paragraph("Email: " + email));
-            document.add(new Paragraph(" ")); // Add a blank line
+            document.add(new Paragraph(" "));
 
-            PdfPTable table = new PdfPTable(4); // 4 columns
+            PdfPTable table = new PdfPTable(4);
             table.addCell("Month");
             table.addCell("Expense Name");
             table.addCell("Amount");
@@ -147,8 +160,7 @@ public class Report extends JFrame {
     }
 
     public static void main(String[] args) {
-        // Example JWT (replace with actual JWT generated during registration)
-        String exampleToken = "token";  // Pass your generated token here
+        String exampleToken = "token"; // Replace with actual token
         new Report(exampleToken);
     }
 }
