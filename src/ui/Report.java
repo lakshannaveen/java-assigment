@@ -41,7 +41,7 @@ public class Report extends JFrame {
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Top Panel with Back Button and Heading
+        // Top Panel
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(Color.WHITE);
 
@@ -66,18 +66,20 @@ public class Report extends JFrame {
         Map<String, List<ExpenseModel>> expensesByPocketName = expenses.stream()
                 .collect(Collectors.groupingBy(ExpenseModel::getPocketName));
 
-        // Horizontal Panel for Pockets
-        JPanel pocketPanel = new JPanel();
-        pocketPanel.setLayout(new BoxLayout(pocketPanel, BoxLayout.X_AXIS));
-        pocketPanel.setBackground(new Color(245, 245, 245));
+        // Pocket Card Scroll Panel
+        JPanel pocketCardContainer = new JPanel();
+        pocketCardContainer.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        pocketCardContainer.setBackground(new Color(245, 245, 245));
 
         for (String pocketName : expensesByPocketName.keySet()) {
             JPanel pocketCard = new JPanel();
             pocketCard.setLayout(new BoxLayout(pocketCard, BoxLayout.Y_AXIS));
-            pocketCard.setPreferredSize(new Dimension(250, 120));
+            pocketCard.setPreferredSize(new Dimension(250, 130));
             pocketCard.setBackground(Color.WHITE);
-            pocketCard.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-            pocketCard.setAlignmentY(Component.TOP_ALIGNMENT);
+            pocketCard.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(Color.GRAY),
+                    BorderFactory.createEmptyBorder(10, 10, 10, 10)
+            ));
 
             JLabel pocketLabel = new JLabel(pocketName, SwingConstants.CENTER);
             pocketLabel.setFont(new Font("Serif", Font.BOLD, 18));
@@ -92,14 +94,14 @@ public class Report extends JFrame {
             pocketCard.add(Box.createRigidArea(new Dimension(0, 10)));
             pocketCard.add(downloadButton);
 
-            pocketPanel.add(Box.createRigidArea(new Dimension(20, 0)));
-            pocketPanel.add(pocketCard);
+            pocketCardContainer.add(pocketCard);
         }
 
-        JScrollPane scrollPane = new JScrollPane(pocketPanel);
-        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        JScrollPane scrollPane = new JScrollPane(pocketCardContainer);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.setBorder(BorderFactory.createTitledBorder("Your Pockets"));
 
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
@@ -109,7 +111,6 @@ public class Report extends JFrame {
         chartPanel.setBorder(BorderFactory.createTitledBorder("Expenses Over Time"));
 
         TimeSeries series = new TimeSeries("All Expenses");
-
         for (ExpenseModel expense : expenses) {
             series.addOrUpdate(new Day(expense.getDate()), expense.getAmount());
         }
