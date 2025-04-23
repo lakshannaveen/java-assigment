@@ -4,19 +4,21 @@ import controllers.AdminController;
 import models.AdminModel;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
+import javax.swing.table.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.util.List;
 
 public class AdminManage extends JFrame {
+    private JTable adminTable;
+    private DefaultTableModel tableModel;
+
     public AdminManage() {
         setTitle("Manage Admins");
-        setSize(700, 450); // Increased window size
+        setSize(750, 450);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Main panel with gradient background
         JPanel mainPanel = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -29,23 +31,21 @@ public class AdminManage extends JFrame {
             }
         };
 
-        // Title label
         JLabel titleLabel = new JLabel("Admin Management", SwingConstants.CENTER);
         AdminDashboardStyle.applyHeaderStyle(titleLabel);
         mainPanel.add(titleLabel, BorderLayout.NORTH);
 
-        // Table to display admins
-        String[] columnNames = {"Username", "Password"};
-        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0) {
+        String[] columnNames = {"Username", "Password", "Action"};
+        tableModel = new DefaultTableModel(null, columnNames) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false;
+                return column == 2;
             }
         };
 
-        JTable adminTable = new JTable(tableModel);
-        adminTable.setRowHeight(28); // Increase row height
-        adminTable.setFont(new Font("SansSerif", Font.PLAIN, 14)); // Increase table font
+        adminTable = new JTable(tableModel);
+        adminTable.setRowHeight(30);
+        adminTable.setFont(new Font("SansSerif", Font.PLAIN, 14));
         adminTable.setSelectionBackground(new Color(180, 200, 255));
         adminTable.setSelectionForeground(Color.BLACK);
 
@@ -53,59 +53,43 @@ public class AdminManage extends JFrame {
         header.setFont(new Font("SansSerif", Font.BOLD, 15));
         header.setPreferredSize(new Dimension(100, 30));
 
+        // Set custom cell renderer/editor for Action column
+        adminTable.getColumnModel().getColumn(2).setCellRenderer(new ButtonRenderer());
+        adminTable.getColumnModel().getColumn(2).setCellEditor(new ButtonEditor(new JCheckBox()));
+
         JScrollPane scrollPane = new JScrollPane(adminTable);
-        scrollPane.setPreferredSize(new Dimension(650, 250)); // Set preferred size for better content layout
+        scrollPane.setPreferredSize(new Dimension(700, 250));
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
-        // Button panel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         buttonPanel.setOpaque(false);
 
         JButton addButton = createStyledButton("Add Admin");
         JButton refreshButton = createStyledButton("Refresh");
-        JButton deleteButton = createStyledButton("Delete Admin");
         JButton backButton = createStyledButton("Back to Dashboard");
 
         int maxWidth = Math.max(addButton.getPreferredSize().width,
-                Math.max(refreshButton.getPreferredSize().width,
-                        Math.max(deleteButton.getPreferredSize().width,
-                                backButton.getPreferredSize().width)));
-
+                Math.max(refreshButton.getPreferredSize().width, backButton.getPreferredSize().width));
         Dimension uniformSize = new Dimension(maxWidth, 35);
         addButton.setPreferredSize(uniformSize);
         refreshButton.setPreferredSize(uniformSize);
-        deleteButton.setPreferredSize(uniformSize);
         backButton.setPreferredSize(uniformSize);
 
         buttonPanel.add(addButton);
         buttonPanel.add(refreshButton);
-        buttonPanel.add(deleteButton);
         buttonPanel.add(backButton);
-
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
-        // Load admin data
-        refreshAdminTable(tableModel);
+        refreshAdminTable();
 
-        // Button actions
-        refreshButton.addActionListener(e -> refreshAdminTable(tableModel));
+        refreshButton.addActionListener(e -> refreshAdminTable());
 
         backButton.addActionListener(e -> {
             new AdminDashboard();
             dispose();
         });
 
-        addButton.addActionListener(e -> showAddAdminDialog(tableModel));
-
-        deleteButton.addActionListener(e -> {
-            int selectedRow = adminTable.getSelectedRow();
-            if (selectedRow >= 0) {
-                String username = (String) tableModel.getValueAt(selectedRow, 0);
-                deleteAdmin(username, tableModel);
-            } else {
-                JOptionPane.showMessageDialog(this, "Please select an admin to delete", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
+        addButton.addActionListener(e -> showAddAdminDialog());
 
         add(mainPanel);
         setVisible(true);
@@ -116,11 +100,7 @@ public class AdminManage extends JFrame {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
-                if (getModel().isRollover()) {
-                    g2.setColor(new Color(70, 130, 180));
-                } else {
-                    g2.setColor(new Color(100, 149, 237));
-                }
+                g2.setColor(getModel().isRollover() ? new Color(70, 130, 180) : new Color(100, 149, 237));
                 g2.fillRect(0, 0, getWidth(), getHeight());
                 g2.dispose();
                 setForeground(Color.WHITE);
@@ -130,37 +110,33 @@ public class AdminManage extends JFrame {
 
         button.setContentAreaFilled(false);
         button.setOpaque(false);
-        button.setForeground(Color.WHITE);
         button.setFont(new Font("Arial", Font.BOLD, 14));
         button.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
         button.setFocusPainted(false);
-
         return button;
     }
 
-    private void refreshAdminTable(DefaultTableModel tableModel) {
+    private void refreshAdminTable() {
         tableModel.setRowCount(0);
         AdminController adminController = new AdminController();
         List<AdminModel> admins = adminController.getAllAdmins();
 
         for (AdminModel admin : admins) {
-            tableModel.addRow(new Object[]{admin.getUsername(), admin.getPassword()});
+            tableModel.addRow(new Object[]{admin.getUsername(), admin.getPassword(), "Delete"});
         }
     }
 
-    private void showAddAdminDialog(DefaultTableModel tableModel) {
-        JPanel panel = new JPanel(new GridLayout(3, 2, 5, 5));
-        JLabel userLabel = new JLabel("Username:");
+    private void showAddAdminDialog() {
+        JPanel panel = new JPanel(new GridLayout(2, 2, 5, 5));
         JTextField userField = new JTextField();
-        JLabel passLabel = new JLabel("Password:");
         JPasswordField passField = new JPasswordField();
 
-        panel.add(userLabel);
+        panel.add(new JLabel("Username:"));
         panel.add(userField);
-        panel.add(passLabel);
+        panel.add(new JLabel("Password:"));
         panel.add(passField);
 
-        int result = JOptionPane.showConfirmDialog(this, panel, "Add New Admin", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        int result = JOptionPane.showConfirmDialog(this, panel, "Add New Admin", JOptionPane.OK_CANCEL_OPTION);
 
         if (result == JOptionPane.OK_OPTION) {
             String username = userField.getText().trim();
@@ -172,29 +148,64 @@ public class AdminManage extends JFrame {
             }
 
             AdminController adminController = new AdminController();
-            boolean success = adminController.registerAdmin(new AdminModel(username, password));
-
-            if (success) {
+            if (adminController.registerAdmin(new AdminModel(username, password))) {
                 JOptionPane.showMessageDialog(this, "Admin added successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
-                refreshAdminTable(tableModel);
+                refreshAdminTable();
             } else {
                 JOptionPane.showMessageDialog(this, "Failed to add admin. Username may already exist.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
 
-    private void deleteAdmin(String username, DefaultTableModel tableModel) {
-        int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete admin '" + username + "'?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
-        if (confirm == JOptionPane.YES_OPTION) {
-            AdminController adminController = new AdminController();
-            boolean success = adminController.deleteAdmin(username);
+    private class ButtonRenderer extends JButton implements TableCellRenderer {
+        public ButtonRenderer() {
+            setOpaque(true);
+            setForeground(Color.WHITE);
+            setFont(new Font("SansSerif", Font.BOLD, 12));
+            setFocusPainted(false);
+            setBorderPainted(false);
+        }
 
-            if (success) {
-                JOptionPane.showMessageDialog(this, "Admin deleted successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
-                refreshAdminTable(tableModel);
-            } else {
-                JOptionPane.showMessageDialog(this, "Failed to delete admin", "Error", JOptionPane.ERROR_MESSAGE);
-            }
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                                                       boolean hasFocus, int row, int col) {
+            setText("Delete");
+            setBackground(isSelected ? new Color(220, 50, 50) : new Color(200, 0, 0));
+            return this;
+        }
+    }
+
+    private class ButtonEditor extends DefaultCellEditor {
+        private final JButton button = new JButton("Delete");
+        private String currentUser;
+
+        public ButtonEditor(JCheckBox checkBox) {
+            super(checkBox);
+            button.setOpaque(true);
+            button.setForeground(Color.WHITE);
+            button.setFont(new Font("SansSerif", Font.BOLD, 12));
+            button.setBorderPainted(false);
+            button.setFocusPainted(false);
+
+            button.addActionListener(e -> {
+                int confirm = JOptionPane.showConfirmDialog(button, "Delete admin '" + currentUser + "'?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    AdminController adminController = new AdminController();
+                    if (adminController.deleteAdmin(currentUser)) {
+                        JOptionPane.showMessageDialog(button, "Admin deleted successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+                        refreshAdminTable();
+                    } else {
+                        JOptionPane.showMessageDialog(button, "Failed to delete admin", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            });
+        }
+
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+            currentUser = (String) table.getValueAt(row, 0);
+            button.setBackground(new Color(200, 0, 0));
+            return button;
         }
     }
 }
