@@ -222,9 +222,9 @@ public class StartPage extends JFrame {
     private void updateSearchFieldPlaceholder() {
         String searchType = (String) searchTypeComboBox.getSelectedItem();
         if (searchType.equals("Expense Name")) {
-            searchField.setText("Search by expense name");
+            searchField.setText("expense name");
         } else if (searchType.equals("Date")) {
-            searchField.setText("Search by date (yyyy-mm-dd)");
+            searchField.setText("search by date");
         } else {
             searchField.setText("Search by amount");
         }
