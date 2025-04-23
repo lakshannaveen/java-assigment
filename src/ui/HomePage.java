@@ -65,7 +65,7 @@ public class HomePage extends JFrame {
         languagePanel.add(languageComboBox);
 
         // Apply styles
-        HomePageStyle.applyStyles(titleLabel, welcomeLabel, loginButton, registerButton, mainPanel);
+        HomePageStyle.applyStyles(titleLabel, welcomeLabel, loginButton, registerButton, mainPanel, languageComboBox);
 
         // Button panel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));

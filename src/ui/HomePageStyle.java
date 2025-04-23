@@ -9,7 +9,7 @@ public class HomePageStyle {
 
     public static void applyStyles(JLabel titleLabel, JLabel welcomeLabel,
                                    JButton loginButton, JButton registerButton,
-                                   JPanel mainPanel) {
+                                   JPanel mainPanel, JComboBox<String> languageComboBox) {
 
         // Apply main background
         mainPanel.setBackground(new Color(204, 255, 204)); // Light green
@@ -27,6 +27,9 @@ public class HomePageStyle {
         // Buttons with rounded style and hover effect
         styleGreenButton(loginButton);
         styleGreenButton(registerButton);
+
+        // Style ComboBox for language selection
+        styleComboBox(languageComboBox);
     }
 
     public static void styleLabel(JLabel label) {
@@ -39,6 +42,19 @@ public class HomePageStyle {
         comboBox.setBackground(Color.WHITE);
         comboBox.setForeground(new Color(0, 102, 0));
         comboBox.setBorder(BorderFactory.createLineBorder(new Color(0, 102, 0), 1));
+
+        // Apply hover effect to combo box
+        comboBox.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                comboBox.setBackground(new Color(240, 255, 240)); // Light green on hover
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                comboBox.setBackground(Color.WHITE); // Reset to white when not hovered
+            }
+        });
     }
 
     private static void styleGreenButton(JButton button) {
