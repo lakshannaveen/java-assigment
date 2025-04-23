@@ -7,97 +7,87 @@ import models.ExpenseModel;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.time.LocalDate;
-import java.time.YearMonth;
 import java.util.Calendar;
 import java.util.Date;
+import java.time.LocalDate;
+import java.time.YearMonth;
 
 public class Expense extends JFrame {
-
     private JComboBox<String> monthComboBox;
     private JSpinner dateSpinner;
     private JTextField pocketNameField;
     private JTextField expenseNameField;
-    private JTextField amountField; // Add amount field
+    private JTextField amountField;
     private ExpenseController expenseController;
     private String token;
 
     public Expense(String token) {
         this.token = token;
-        setTitle("Expense Tracker");
-        setSize(400, 400);
+        setTitle("Add Expense");
+        setSize(500, 480);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-
         expenseController = new ExpenseController();
 
         JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(Color.WHITE);
 
-        JButton backButton = new JButton("Back");
-        ExpenseStyle.styleButton(backButton);
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new StartPage(token);
-                dispose();
-            }
+        // Back Button
+        JButton backButton = new JButton("← Back");
+        ExpenseStyle.styleBackButton(backButton);
+        backButton.addActionListener(e -> {
+            new StartPage(token);
+            dispose();
         });
-
         JPanel backButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        backButtonPanel.setBackground(Color.WHITE);
         backButtonPanel.add(backButton);
         mainPanel.add(backButtonPanel, BorderLayout.NORTH);
 
-        JPanel formPanel = new JPanel(new GridLayout(5, 2, 10, 10)); // Update grid layout to 5 rows
-        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        // Form
+        JPanel formPanel = new JPanel(new GridLayout(6, 2, 12, 16));
+        formPanel.setBackground(Color.WHITE);
+        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
 
-        JLabel pocketNameLabel = new JLabel("Pocket Name:");
         pocketNameField = new JTextField();
+        expenseNameField = new JTextField();
+        amountField = new JTextField();
         ExpenseStyle.addPlaceholder(pocketNameField, "Enter pocket name");
-        formPanel.add(pocketNameLabel);
-        formPanel.add(pocketNameField);
+        ExpenseStyle.addPlaceholder(expenseNameField, "Enter expense name");
+        ExpenseStyle.addPlaceholder(amountField, "Enter amount");
 
-        JLabel monthLabel = new JLabel("Select Month:");
         monthComboBox = new JComboBox<>();
         populateMonthComboBox();
-        formPanel.add(monthLabel);
-        formPanel.add(monthComboBox);
 
-        JLabel expenseNameLabel = new JLabel("Expense Name (optional):");
-        expenseNameField = new JTextField();
-        ExpenseStyle.addPlaceholder(expenseNameField, "Enter expense name");
-        formPanel.add(expenseNameLabel);
-        formPanel.add(expenseNameField);
-
-        JLabel amountLabel = new JLabel("Amount (optional):"); // Add amount label
-        amountField = new JTextField();
-        ExpenseStyle.addPlaceholder(amountField, "Enter amount");
-        formPanel.add(amountLabel);
-        formPanel.add(amountField);
-
-        JLabel dateLabel = new JLabel("Select Date (optional):");
         dateSpinner = new JSpinner(new SpinnerDateModel());
         JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(dateSpinner, "dd-MM-yyyy");
         dateSpinner.setEditor(dateEditor);
         setDateRange();
-        formPanel.add(dateLabel);
+
+        formPanel.add(new JLabel("Pocket Name:"));
+        formPanel.add(pocketNameField);
+        formPanel.add(new JLabel("Select Month:"));
+        formPanel.add(monthComboBox);
+        formPanel.add(new JLabel("Expense Name (optional):"));
+        formPanel.add(expenseNameField);
+        formPanel.add(new JLabel("Amount (optional):"));
+        formPanel.add(amountField);
+        formPanel.add(new JLabel("Select Date (optional):"));
         formPanel.add(dateSpinner);
 
         mainPanel.add(formPanel, BorderLayout.CENTER);
 
-        JButton submitButton = new JButton("Submit");
-        ExpenseStyle.styleButton(submitButton);
-        submitButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                clearPlaceholders();
-                validateAndSubmitForm();
-            }
+        // Submit
+        JButton submitButton = new JButton("Submit Expense");
+        ExpenseStyle.styleSubmitButton(submitButton);
+        submitButton.addActionListener(e -> {
+            clearPlaceholders();
+            validateAndSubmitForm();
         });
-
-        JPanel submitButtonPanel = new JPanel();
-        submitButtonPanel.add(submitButton);
-        mainPanel.add(submitButtonPanel, BorderLayout.SOUTH);
+        JPanel submitPanel = new JPanel();
+        submitPanel.setBackground(Color.WHITE);
+        submitPanel.add(submitButton);
+        mainPanel.add(submitPanel, BorderLayout.SOUTH);
 
         add(mainPanel);
         setVisible(true);
@@ -105,92 +95,70 @@ public class Expense extends JFrame {
 
     private void populateMonthComboBox() {
         LocalDate now = LocalDate.now();
-        YearMonth currentYearMonth = YearMonth.of(now.getYear(), now.getMonth());
-        monthComboBox.addItem(currentYearMonth.getMonth().name() + " " + currentYearMonth.getYear());
+        YearMonth ym = YearMonth.of(now.getYear(), now.getMonth());
+        monthComboBox.addItem(ym.getMonth().name() + " " + ym.getYear());
         monthComboBox.setSelectedIndex(0);
         monthComboBox.setEnabled(false);
     }
 
     private void setDateRange() {
         LocalDate now = LocalDate.now();
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, now.getYear());
-        calendar.set(Calendar.MONTH, now.getMonthValue() - 1);
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        Date startDate = calendar.getTime();
-        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
-        Date endDate = calendar.getTime();
-        ((SpinnerDateModel) dateSpinner.getModel()).setStart(startDate);
-        ((SpinnerDateModel) dateSpinner.getModel()).setEnd(endDate);
-        dateSpinner.setValue(startDate);
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, now.getYear());
+        cal.set(Calendar.MONTH, now.getMonthValue() - 1);
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        Date start = cal.getTime();
+        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+        Date end = cal.getTime();
+        ((SpinnerDateModel) dateSpinner.getModel()).setStart(start);
+        ((SpinnerDateModel) dateSpinner.getModel()).setEnd(end);
+        dateSpinner.setValue(start);
     }
 
     private void clearPlaceholders() {
-        if (pocketNameField.getForeground() == Color.GRAY) {
-            pocketNameField.setText("");
-            pocketNameField.setForeground(Color.BLACK);
-        }
-        if (expenseNameField.getForeground() == Color.GRAY) {
-            expenseNameField.setText("");
-            expenseNameField.setForeground(Color.BLACK);
-        }
-        if (amountField.getForeground() == Color.GRAY) { // Clear amount placeholder
-            amountField.setText("");
-            amountField.setForeground(Color.BLACK);
-        }
+        if (pocketNameField.getForeground() == Color.GRAY) pocketNameField.setText("");
+        if (expenseNameField.getForeground() == Color.GRAY) expenseNameField.setText("");
+        if (amountField.getForeground() == Color.GRAY) amountField.setText("");
     }
 
     private String getEmailFromToken(String token) {
         try {
-            // Decode JWT token to get the email claim
-            DecodedJWT decodedJWT = JWT.decode(token);
-            return decodedJWT.getClaim("email").asString();
+            DecodedJWT decoded = JWT.decode(token);
+            return decoded.getClaim("email").asString();
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;  // Return null if there is any error decoding the token
+            return null;
         }
     }
 
     private void validateAndSubmitForm() {
-        String pocketName = pocketNameField.getText();
-        String selectedMonth = (String) monthComboBox.getSelectedItem();
-        String expenseName = expenseNameField.getText();
-        String amountText = amountField.getText(); // Get amount text
-        Date selectedDate = (Date) dateSpinner.getValue();
+        String pocket = pocketNameField.getText();
+        String month = (String) monthComboBox.getSelectedItem();
+        String name = expenseNameField.getText();
+        String amountText = amountField.getText();
+        Date date = (Date) dateSpinner.getValue();
         String email = getEmailFromToken(token);
 
-        if (pocketName.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Pocket Name is required", "Validation Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        if (selectedMonth == null) {
-            JOptionPane.showMessageDialog(null, "Month selection is required", "Validation Error", JOptionPane.ERROR_MESSAGE);
+        if (pocket.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Pocket Name is required", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         double amount = 0;
         if (!amountText.isEmpty()) {
             try {
-                amount = Double.parseDouble(amountText); // Parse amount
+                amount = Double.parseDouble(amountText);
             } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "Invalid amount", "Validation Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Amount must be a number", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
         }
 
-        ExpenseModel expense = new ExpenseModel(pocketName, selectedMonth, expenseName, amount, selectedDate, email);
+        ExpenseModel expense = new ExpenseModel(pocket, month, name, amount, date, email);
         expenseController.addExpense(expense);
-
-        JOptionPane.showMessageDialog(null, "Expense added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, "Expense added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new Expense("token"); // Replace with actual token logic
-            }
-        });
+        SwingUtilities.invokeLater(() -> new Expense("your_token_here"));
     }
 }

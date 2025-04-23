@@ -1,46 +1,80 @@
 package ui;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 
 public class ExpenseStyle {
+    private static final Color green = new Color(46, 204, 113); // Green
+    private static final Color greenDark = new Color(39, 174, 96);
+    private static final Font fontInput = new Font("SansSerif", Font.PLAIN, 14);
+    private static final Font fontPlaceholder = new Font("SansSerif", Font.ITALIC, 14);
+    private static final Font fontButton = new Font("SansSerif", Font.BOLD, 16);
 
-    public static void styleButton(JButton button) {
-        button.setFont(new Font("SansSerif", Font.BOLD, 16));
-        button.setBackground(new Color(34, 139, 34)); // Updated Green color
+    public static void styleSubmitButton(JButton button) {
+        button.setFont(fontButton);
+        button.setBackground(green);
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(28, 125, 68), 2),
-                BorderFactory.createEmptyBorder(5, 15, 5, 15)
-        ));
-        button.setOpaque(true);
+        button.setPreferredSize(new Dimension(180, 45));
+        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.setOpaque(true);
+
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(greenDark);
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(green);
+            }
+        });
+    }
+
+    public static void styleBackButton(JButton button) {
+        button.setFont(fontButton);
+        button.setForeground(greenDark);
+        button.setBackground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createLineBorder(greenDark, 2));
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.setOpaque(true);
+
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setForeground(green);
+                button.setBorder(BorderFactory.createLineBorder(green, 2));
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setForeground(greenDark);
+                button.setBorder(BorderFactory.createLineBorder(greenDark, 2));
+            }
+        });
     }
 
     public static void addPlaceholder(JTextField textField, String placeholder) {
+        textField.setFont(fontPlaceholder);
         textField.setForeground(Color.GRAY);
         textField.setText(placeholder);
-        textField.setFont(new Font("SansSerif", Font.ITALIC, 14));
 
-        textField.addFocusListener(new FocusListener() {
-            @Override
+        textField.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent e) {
                 if (textField.getText().equals(placeholder)) {
                     textField.setText("");
+                    textField.setFont(fontInput);
                     textField.setForeground(Color.BLACK);
-                    textField.setFont(new Font("SansSerif", Font.PLAIN, 14));
                 }
             }
 
-            @Override
             public void focusLost(FocusEvent e) {
                 if (textField.getText().isEmpty()) {
-                    textField.setForeground(Color.GRAY);
                     textField.setText(placeholder);
-                    textField.setFont(new Font("SansSerif", Font.ITALIC, 14));
+                    textField.setFont(fontPlaceholder);
+                    textField.setForeground(Color.GRAY);
                 }
             }
         });
