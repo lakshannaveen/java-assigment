@@ -111,7 +111,7 @@ public class StartPage extends JFrame {
         buttonPanel.add(refreshButton, gbc);
 
         // Search type combo box
-        String[] searchTypes = {"Expense Name", "Date"};
+        String[] searchTypes = {"Expense Name", "Date", "Amount"};
         searchTypeComboBox = new JComboBox<>(searchTypes);
         StartPageStyle.styleComboBox(searchTypeComboBox);
 
@@ -124,7 +124,8 @@ public class StartPage extends JFrame {
             @Override
             public void focusGained(FocusEvent e) {
                 if (searchField.getText().equals("Search by expense name") ||
-                        searchField.getText().equals("Search by date (yyyy-mm-dd)")) {
+                        searchField.getText().equals("Search by date (yyyy-mm-dd)") ||
+                        searchField.getText().equals("Search by amount")) {
                     searchField.setText("");
                     searchField.setForeground(Color.BLACK);
                 }
@@ -133,12 +134,7 @@ public class StartPage extends JFrame {
             @Override
             public void focusLost(FocusEvent e) {
                 if (searchField.getText().isEmpty()) {
-                    if (searchTypeComboBox.getSelectedItem().equals("Expense Name")) {
-                        searchField.setText("Search by expense name");
-                    } else {
-                        searchField.setText("Search by date (yyyy-mm-dd)");
-                    }
-                    searchField.setForeground(Color.GRAY);
+                    updateSearchFieldPlaceholder();
                 }
             }
         });
@@ -147,12 +143,7 @@ public class StartPage extends JFrame {
         searchTypeComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (searchTypeComboBox.getSelectedItem().equals("Expense Name")) {
-                    searchField.setText("Search by expense name");
-                } else {
-                    searchField.setText("Search by date (yyyy-mm-dd)");
-                }
-                searchField.setForeground(Color.GRAY);
+                updateSearchFieldPlaceholder();
             }
         });
 
@@ -209,6 +200,24 @@ public class StartPage extends JFrame {
         // Add the main panel to the frame and make it visible
         add(mainPanel);
         setVisible(true);
+    }
+
+    private void updateSearchFieldPlaceholder() {
+        String searchType = (String) searchTypeComboBox.getSelectedItem();
+        if (searchField.getText().isEmpty() ||
+                searchField.getText().equals("Search by expense name") ||
+                searchField.getText().equals("Search by date (yyyy-mm-dd)") ||
+                searchField.getText().equals("Search by amount")) {
+
+            if (searchType.equals("Expense Name")) {
+                searchField.setText("Search by expense name");
+            } else if (searchType.equals("Date")) {
+                searchField.setText("search by date");
+            } else {
+                searchField.setText("Search by amount");
+            }
+            searchField.setForeground(Color.GRAY);
+        }
     }
 
     private void loadExpenses(String email) {
@@ -309,11 +318,22 @@ public class StartPage extends JFrame {
             filteredExpenses = expenses.stream()
                     .filter(expense -> levenshtein.apply(expense.getExpenseName().toLowerCase(), searchTerm.toLowerCase()) <= 3)
                     .collect(Collectors.toList());
-        } else {
+        } else if (searchType.equals("Date")) {
             // Filter expenses by date (exact match)
             filteredExpenses = expenses.stream()
                     .filter(expense -> expense.getDate().toString().contains(searchTerm))
                     .collect(Collectors.toList());
+        } else {
+            // Filter expenses by amount (exact or partial match)
+            try {
+                double amountToSearch = Double.parseDouble(searchTerm);
+                filteredExpenses = expenses.stream()
+                        .filter(expense -> expense.getAmount() == amountToSearch)
+                        .collect(Collectors.toList());
+            } catch (NumberFormatException e) {
+                // If not a valid number, return empty list
+                filteredExpenses = List.of();
+            }
         }
 
         if (filteredExpenses.isEmpty()) {
