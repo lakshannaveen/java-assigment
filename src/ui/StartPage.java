@@ -8,7 +8,6 @@ import org.apache.commons.text.similarity.LevenshteinDistance;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -171,10 +170,23 @@ public class StartPage extends JFrame {
         gbc.gridx = 4;
         buttonPanel.add(searchButton, gbc);
 
+        // Add Bill button
+        JButton billButton = new JButton("Bill");
+        StartPageStyle.styleBlueButton(billButton);  // Apply styling for blue button
+        billButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new BillPage(token);  // Navigate to Bill page with token
+                dispose();  // Close current window
+            }
+        });
+
+        gbc.gridx = 5;
+        buttonPanel.add(billButton, gbc);
+
         // Add Report button
         JButton reportButton = new JButton("Report");
         StartPageStyle.styleBlueButton(reportButton);  // Apply styling for blue button
-
         reportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -183,13 +195,12 @@ public class StartPage extends JFrame {
             }
         });
 
-        gbc.gridx = 5;
+        gbc.gridx = 6;
         buttonPanel.add(reportButton, gbc);
 
         // Add Logout button
         JButton logoutButton = new JButton("Logout");
         StartPageStyle.styleRedButton(logoutButton);  // Apply styling for red button
-
         logoutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -198,7 +209,7 @@ public class StartPage extends JFrame {
             }
         });
 
-        gbc.gridx = 6;
+        gbc.gridx = 7;
         buttonPanel.add(logoutButton, gbc);
 
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
