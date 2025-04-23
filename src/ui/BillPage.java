@@ -58,8 +58,8 @@ public class BillPage extends JFrame {
 
         // White back button with black text
         JButton backButton = new JButton("⬅ Back");
-        backButton.setBackground(Color.WHITE);
-        backButton.setForeground(Color.BLACK);
+        backButton.setBackground(Color.black);
+        backButton.setForeground(Color.white);
         backButton.setFont(new Font("Arial", Font.BOLD, 14));
         backButton.setFocusPainted(false);
         backButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
