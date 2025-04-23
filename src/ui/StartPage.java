@@ -26,6 +26,7 @@ public class StartPage extends JFrame {
     private JTabbedPane tabbedPane;
     private JTextField searchField;
     private JButton searchButton;
+    private JComboBox<String> searchTypeComboBox;
 
     public StartPage(String token) {
         this.token = token; // Store the token
@@ -109,6 +110,11 @@ public class StartPage extends JFrame {
         gbc.gridx = 1;
         buttonPanel.add(refreshButton, gbc);
 
+        // Search type combo box
+        String[] searchTypes = {"Expense Name", "Date"};
+        searchTypeComboBox = new JComboBox<>(searchTypes);
+        StartPageStyle.styleComboBox(searchTypeComboBox);
+
         // Search field and button
         searchField = new JTextField("Search by expense name", 15); // Reduced column count
         StartPageStyle.styleSearchField(searchField);  // Apply styling for search field
@@ -117,7 +123,8 @@ public class StartPage extends JFrame {
         searchField.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
-                if (searchField.getText().equals("Search by expense name")) {
+                if (searchField.getText().equals("Search by expense name") ||
+                        searchField.getText().equals("Search by date (yyyy-mm-dd)")) {
                     searchField.setText("");
                     searchField.setForeground(Color.BLACK);
                 }
@@ -126,9 +133,26 @@ public class StartPage extends JFrame {
             @Override
             public void focusLost(FocusEvent e) {
                 if (searchField.getText().isEmpty()) {
-                    searchField.setText("Search by expense name");
+                    if (searchTypeComboBox.getSelectedItem().equals("Expense Name")) {
+                        searchField.setText("Search by expense name");
+                    } else {
+                        searchField.setText("Search by date (yyyy-mm-dd)");
+                    }
                     searchField.setForeground(Color.GRAY);
                 }
+            }
+        });
+
+        // Add action listener to search type combo box
+        searchTypeComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (searchTypeComboBox.getSelectedItem().equals("Expense Name")) {
+                    searchField.setText("Search by expense name");
+                } else {
+                    searchField.setText("Search by date (yyyy-mm-dd)");
+                }
+                searchField.setForeground(Color.GRAY);
             }
         });
 
@@ -138,13 +162,16 @@ public class StartPage extends JFrame {
         searchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                searchExpenses(email, searchField.getText().trim());
+                String searchType = (String) searchTypeComboBox.getSelectedItem();
+                searchExpenses(email, searchField.getText().trim(), searchType);
             }
         });
 
         gbc.gridx = 2;
-        buttonPanel.add(searchField, gbc);
+        buttonPanel.add(searchTypeComboBox, gbc);
         gbc.gridx = 3;
+        buttonPanel.add(searchField, gbc);
+        gbc.gridx = 4;
         buttonPanel.add(searchButton, gbc);
 
         // Add Report button
@@ -159,7 +186,7 @@ public class StartPage extends JFrame {
             }
         });
 
-        gbc.gridx = 4;
+        gbc.gridx = 5;
         buttonPanel.add(reportButton, gbc);
 
         // Add Logout button
@@ -174,7 +201,7 @@ public class StartPage extends JFrame {
             }
         });
 
-        gbc.gridx = 5;
+        gbc.gridx = 6;
         buttonPanel.add(logoutButton, gbc);
 
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
@@ -269,16 +296,25 @@ public class StartPage extends JFrame {
         }
     }
 
-    private void searchExpenses(String email, String searchTerm) {
+    private void searchExpenses(String email, String searchTerm, String searchType) {
         tabbedPane.removeAll();  // Clear existing tabs
 
         List<ExpenseModel> expenses = expenseController.getExpensesByEmail(email);
 
-        // Filter expenses by the search term using fuzzy matching
-        LevenshteinDistance levenshtein = new LevenshteinDistance();
-        List<ExpenseModel> filteredExpenses = expenses.stream()
-                .filter(expense -> levenshtein.apply(expense.getExpenseName().toLowerCase(), searchTerm.toLowerCase()) <= 3)
-                .collect(Collectors.toList());
+        List<ExpenseModel> filteredExpenses;
+
+        if (searchType.equals("Expense Name")) {
+            // Filter expenses by the search term using fuzzy matching for expense name
+            LevenshteinDistance levenshtein = new LevenshteinDistance();
+            filteredExpenses = expenses.stream()
+                    .filter(expense -> levenshtein.apply(expense.getExpenseName().toLowerCase(), searchTerm.toLowerCase()) <= 3)
+                    .collect(Collectors.toList());
+        } else {
+            // Filter expenses by date (exact match)
+            filteredExpenses = expenses.stream()
+                    .filter(expense -> expense.getDate().toString().contains(searchTerm))
+                    .collect(Collectors.toList());
+        }
 
         if (filteredExpenses.isEmpty()) {
             // Show a message if no expenses are found

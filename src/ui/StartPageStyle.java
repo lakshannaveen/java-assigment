@@ -135,4 +135,15 @@ public class StartPageStyle {
             column.setPreferredWidth(150);
         }
     }
+
+    // 🔧 Added this method to style JComboBox
+    public static void styleComboBox(JComboBox<String> comboBox) {
+        comboBox.setFont(SEARCH_FONT);
+        comboBox.setPreferredSize(SEARCH_FIELD_SIZE);
+        comboBox.setMinimumSize(SEARCH_FIELD_SIZE);
+        comboBox.setMaximumSize(SEARCH_FIELD_SIZE);
+        comboBox.setBackground(Color.WHITE);
+        comboBox.setForeground(Color.BLACK);
+        comboBox.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
+    }
 }
