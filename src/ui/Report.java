@@ -43,10 +43,15 @@ public class Report extends JFrame {
 
         // Top Panel
         JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(Color.WHITE);
+        topPanel.setBackground(Color.BLACK);
 
         JButton backButton = new JButton("← Back");
-        ReportStyle.styleGreenButton(backButton);
+        backButton.setBackground(Color.BLACK);
+        backButton.setForeground(Color.WHITE);
+        backButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        backButton.setFocusPainted(false);
+        backButton.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
+        backButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         backButton.addActionListener(e -> {
             new StartPage(token);
             dispose();
@@ -56,7 +61,7 @@ public class Report extends JFrame {
 
         JLabel headingLabel = new JLabel("My Pocket Reports", SwingConstants.CENTER);
         headingLabel.setFont(new Font("Serif", Font.BOLD, 26));
-        headingLabel.setForeground(new Color(44, 44, 44));
+        headingLabel.setForeground(Color.WHITE);
         topPanel.add(headingLabel, BorderLayout.CENTER);
 
         mainPanel.add(topPanel, BorderLayout.NORTH);
