@@ -110,9 +110,9 @@ public class StartPage extends JFrame {
         buttonPanel.add(refreshButton, gbc);
 
         // Search field and button
-        searchField = new JTextField("Search by expense name", 20);
+        searchField = new JTextField("Search by expense name", 15); // Reduced column count
+        StartPageStyle.styleSearchField(searchField);  // Apply styling for search field
         searchField.setForeground(Color.GRAY);  // Set initial placeholder color
-
         // Add FocusListener
         searchField.addFocusListener(new FocusAdapter() {
             @Override
