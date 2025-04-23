@@ -41,6 +41,7 @@ public class AdminDashboard extends JFrame {
         // Clock Panel
         JPanel clockPanel = new JPanel();
         JLabel clockLabel = new JLabel();
+        clockPanel.setOpaque(false);
         clockPanel.add(clockLabel);
         mainPanel.add(clockPanel, BorderLayout.SOUTH);
 
@@ -58,22 +59,21 @@ public class AdminDashboard extends JFrame {
         // Buttons Panel
         JButton showLogsButton = new JButton("Show Logs");
         JButton accountsButton = new JButton("Accounts");
-        JButton adminsButton = new JButton("Manage Admins"); // New button
+        JButton adminsButton = new JButton("Manage Admins");
 
         AdminDashboardStyle.applyButtonStyle(showLogsButton);
         AdminDashboardStyle.applyButtonStyle(accountsButton);
-        AdminDashboardStyle.applyButtonStyle(adminsButton); // Style the new button
+        AdminDashboardStyle.applyButtonStyle(adminsButton);
 
         JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.setOpaque(false);
         buttonPanel.add(showLogsButton);
         buttonPanel.add(accountsButton);
-        buttonPanel.add(adminsButton); // Add the new button
+        buttonPanel.add(adminsButton);
 
         mainPanel.add(buttonPanel, BorderLayout.CENTER);
         add(mainPanel);
 
-        // Action Listeners
         showLogsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -85,7 +85,7 @@ public class AdminDashboard extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new AdminUserAccounts();
-                dispose(); // Close the current frame
+                dispose();
             }
         });
 
@@ -93,7 +93,7 @@ public class AdminDashboard extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new AdminManage();
-                dispose(); // Close the current frame
+                dispose();
             }
         });
 
@@ -106,12 +106,13 @@ public class AdminDashboard extends JFrame {
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Make the table read-only
+                return false;
             }
         };
         JTable table = new JTable(tableModel);
         JTableHeader header = table.getTableHeader();
-        header.setBackground(Color.LIGHT_GRAY);
+        header.setBackground(new Color(173, 216, 230));
+        table.setBackground(new Color(224, 255, 255));
 
         JScrollPane scrollPane = new JScrollPane(table);
 
@@ -124,18 +125,10 @@ public class AdminDashboard extends JFrame {
                     String[] keyValue = part.split(": ");
                     if (keyValue.length == 2) {
                         switch (keyValue[0]) {
-                            case "Event":
-                                rowData[0] = keyValue[1];
-                                break;
-                            case "UserType":
-                                rowData[1] = keyValue[1];
-                                break;
-                            case "Username":
-                                rowData[2] = keyValue[1];
-                                break;
-                            case "Time":
-                                rowData[3] = keyValue[1];
-                                break;
+                            case "Event": rowData[0] = keyValue[1]; break;
+                            case "UserType": rowData[1] = keyValue[1]; break;
+                            case "Username": rowData[2] = keyValue[1]; break;
+                            case "Time": rowData[3] = keyValue[1]; break;
                         }
                     }
                 }
@@ -158,7 +151,7 @@ public class AdminDashboard extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 try {
                     downloadLogsAsPdf();
-                } catch (FileNotFoundException | DocumentException ex) {
+                } catch (Exception ex) {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(AdminDashboard.this, "Failed to download PDF.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -171,12 +164,12 @@ public class AdminDashboard extends JFrame {
         JOptionPane.showMessageDialog(this, panel, "Log Contents", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    private void downloadLogsAsPdf() throws FileNotFoundException, DocumentException {
+    private void downloadLogsAsPdf() throws Exception {
         Document document = new Document();
         PdfWriter.getInstance(document, new FileOutputStream("logs.pdf"));
         document.open();
 
-        // Use fully qualified com.itextpdf.text.Font
+        // Use the iText PDF Font explicitly (com.itextpdf.text.Font)
         com.itextpdf.text.Font font = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA, 12, com.itextpdf.text.Font.BOLD);
         Paragraph title = new Paragraph("Log Contents", font);
         title.setAlignment(Element.ALIGN_CENTER);
@@ -203,18 +196,10 @@ public class AdminDashboard extends JFrame {
                     String[] keyValue = part.split(": ");
                     if (keyValue.length == 2) {
                         switch (keyValue[0]) {
-                            case "Event":
-                                rowData[0] = keyValue[1];
-                                break;
-                            case "UserType":
-                                rowData[1] = keyValue[1];
-                                break;
-                            case "Username":
-                                rowData[2] = keyValue[1];
-                                break;
-                            case "Time":
-                                rowData[3] = keyValue[1];
-                                break;
+                            case "Event": rowData[0] = keyValue[1]; break;
+                            case "UserType": rowData[1] = keyValue[1]; break;
+                            case "Username": rowData[2] = keyValue[1]; break;
+                            case "Time": rowData[3] = keyValue[1]; break;
                         }
                     }
                 }
@@ -222,10 +207,6 @@ public class AdminDashboard extends JFrame {
                     table.addCell(new PdfPCell(new Phrase(data)));
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Failed to load logs.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
         }
 
         document.add(table);

@@ -24,22 +24,22 @@ public class AdminDashboardStyle {
     }
 
     public static void applyButtonStyle(JButton button) {
-        Color normalColor = new Color(70, 130, 180);  // SteelBlue
-        Color hoverColor = new Color(255, 255, 255, 180);  // semi-transparent white
+        Color normalColor = new Color(70, 130, 180);
+        Color hoverColor = new Color(255, 255, 255, 180);
         button.setBackground(normalColor);
         button.setForeground(Color.WHITE);
         button.setFont(new Font("Arial", Font.BOLD, 14));
         button.setFocusPainted(false);
         button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        button.setContentAreaFilled(false); // allow custom paint
+        button.setContentAreaFilled(false);
         button.setOpaque(true);
 
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
                 button.setBackground(Color.WHITE);
-                button.setForeground(normalColor); // invert text color
+                button.setForeground(normalColor);
             }
 
             @Override
