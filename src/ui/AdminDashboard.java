@@ -2,14 +2,20 @@ package ui;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
+import org.jfree.chart.*;
+import org.jfree.chart.plot.*;
+import org.jfree.data.category.*;
 import javax.swing.*;
+import org.jfree.chart.renderer.category.BarRenderer;
+import javax.swing.Timer; // Explicitly using Swing Timer
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.*;
+import java.util.List;
 
 public class AdminDashboard extends JFrame {
 
@@ -17,7 +23,7 @@ public class AdminDashboard extends JFrame {
 
     public AdminDashboard() {
         setTitle("Admin Dashboard");
-        setSize(700, 500);
+        setSize(900, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -45,6 +51,7 @@ public class AdminDashboard extends JFrame {
         clockPanel.add(clockLabel);
         mainPanel.add(clockPanel, BorderLayout.SOUTH);
 
+        // Using javax.swing.Timer explicitly
         Timer timer = new Timer(1000, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -59,8 +66,9 @@ public class AdminDashboard extends JFrame {
         JButton accountsButton = new JButton("Accounts");
         JButton adminsButton = new JButton("Manage Admins");
         JButton logoutButton = new JButton("Logout");
+        JButton showChartButton = new JButton("Login Analysis");
 
-        JButton[] buttons = {showLogsButton, accountsButton, adminsButton, logoutButton};
+        JButton[] buttons = {showLogsButton, accountsButton, adminsButton, showChartButton, logoutButton};
 
         for (JButton button : buttons) {
             AdminDashboardStyle.applyButtonStyle(button);
@@ -73,7 +81,12 @@ public class AdminDashboard extends JFrame {
             buttonPanel.add(button);
         }
 
-        mainPanel.add(buttonPanel, BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.NORTH);
+
+        // Add default chart panel to center
+        JPanel chartPanel = createLoginTimeChartPanel();
+        mainPanel.add(chartPanel, BorderLayout.CENTER);
+
         add(mainPanel);
 
         showLogsButton.addActionListener(e -> showLogs());
@@ -89,9 +102,106 @@ public class AdminDashboard extends JFrame {
             new HomePage();
             dispose();
         });
+        showChartButton.addActionListener(e -> {
+            JPanel newChartPanel = createLoginTimeChartPanel();
+            mainPanel.remove(1); // Remove the center component
+            mainPanel.add(newChartPanel, BorderLayout.CENTER);
+            mainPanel.revalidate();
+            mainPanel.repaint();
+        });
 
         AdminDashboardStyle.applyFrameStyle(this);
         setVisible(true);
+    }
+
+    private JPanel createLoginTimeChartPanel() {
+        // Get login data by hour
+        Map<Integer, Integer> loginsByHour = getLoginsByHour();
+
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        for (int hour = 0; hour < 24; hour++) {
+            dataset.addValue(loginsByHour.getOrDefault(hour, 0), "Logins", String.format("%02d:00", hour));
+        }
+
+        JFreeChart chart = ChartFactory.createBarChart(
+                "User Login Time Distribution",
+                "Time of Day",
+                "Number of Logins",
+                dataset,
+                PlotOrientation.VERTICAL,
+                true,
+                true,
+                false
+        );
+
+        // Customize chart appearance
+        chart.setBackgroundPaint(new Color(230, 240, 255));
+        CategoryPlot plot = chart.getCategoryPlot();
+        plot.setBackgroundPaint(new Color(240, 248, 255));
+        plot.setRangeGridlinePaint(Color.BLUE);
+
+        BarRenderer renderer = (BarRenderer) plot.getRenderer();
+        renderer.setSeriesPaint(0, new Color(70, 130, 180));
+        renderer.setShadowVisible(false);
+        renderer.setDrawBarOutline(false);
+
+        ChartPanel chartPanel = new ChartPanel(chart);
+        chartPanel.setPreferredSize(new Dimension(800, 450));
+        chartPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setOpaque(false);
+        panel.add(chartPanel, BorderLayout.CENTER);
+
+        // Add refresh button
+        JButton refreshButton = new JButton("Refresh Chart");
+        AdminDashboardStyle.applyButtonStyle(refreshButton);
+        refreshButton.addActionListener(e -> {
+            JPanel newChartPanel = createLoginTimeChartPanel();
+            panel.removeAll();
+            panel.add(newChartPanel, BorderLayout.CENTER);
+            panel.add(refreshButton, BorderLayout.SOUTH);
+            panel.revalidate();
+            panel.repaint();
+        });
+
+        panel.add(refreshButton, BorderLayout.SOUTH);
+        return panel;
+    }
+
+    private Map<Integer, Integer> getLoginsByHour() {
+        Map<Integer, Integer> hourCounts = new HashMap<>();
+        for (int i = 0; i < 24; i++) {
+            hourCounts.put(i, 0);
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(LOG_FILE_PATH))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.contains("Event: Login")) {
+                    String[] parts = line.split(", ");
+                    for (String part : parts) {
+                        if (part.startsWith("Time: ")) {
+                            String timeStr = part.substring(6);
+                            try {
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                Date date = sdf.parse(timeStr);
+                                Calendar cal = Calendar.getInstance();
+                                cal.setTime(date);
+                                int hour = cal.get(Calendar.HOUR_OF_DAY);
+                                hourCounts.put(hour, hourCounts.get(hour) + 1);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return hourCounts;
     }
 
     private void showLogs() {
