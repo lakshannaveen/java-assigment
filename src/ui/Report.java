@@ -9,22 +9,21 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import controllers.ExpenseController;
 import models.ExpenseModel;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Report extends JFrame {
     private String token;
@@ -42,40 +41,66 @@ public class Report extends JFrame {
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        JLabel welcomeLabel = new JLabel("Welcome to the Report Page!", SwingConstants.CENTER);
-        welcomeLabel.setFont(new java.awt.Font("Serif", java.awt.Font.BOLD, 24));
-        welcomeLabel.setForeground(Color.DARK_GRAY);
-        mainPanel.add(welcomeLabel, BorderLayout.NORTH);
+        // Top Panel with Back Button and Heading
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBackground(Color.WHITE);
 
-        JPanel pocketPanel = new JPanel();
-        pocketPanel.setLayout(new BoxLayout(pocketPanel, BoxLayout.Y_AXIS));
-        pocketPanel.setBackground(new Color(245, 245, 245));
+        JButton backButton = new JButton("← Back");
+        ReportStyle.styleGreenButton(backButton);
+        backButton.addActionListener(e -> {
+            new StartPage(token);
+            dispose();
+        });
+
+        topPanel.add(backButton, BorderLayout.WEST);
+
+        JLabel headingLabel = new JLabel("My Pocket Reports", SwingConstants.CENTER);
+        headingLabel.setFont(new Font("Serif", Font.BOLD, 26));
+        headingLabel.setForeground(new Color(44, 44, 44));
+        topPanel.add(headingLabel, BorderLayout.CENTER);
+
+        mainPanel.add(topPanel, BorderLayout.NORTH);
 
         String email = getEmailFromToken(token);
         List<ExpenseModel> expenses = expenseController.getExpensesByEmail(email);
-
         Map<String, List<ExpenseModel>> expensesByPocketName = expenses.stream()
                 .collect(Collectors.groupingBy(ExpenseModel::getPocketName));
 
-        for (String pocketName : expensesByPocketName.keySet()) {
-            JPanel pocketRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
-            pocketRow.setBackground(new Color(245, 245, 245));
+        // Horizontal Panel for Pockets
+        JPanel pocketPanel = new JPanel();
+        pocketPanel.setLayout(new BoxLayout(pocketPanel, BoxLayout.X_AXIS));
+        pocketPanel.setBackground(new Color(245, 245, 245));
 
-            JLabel pocketLabel = new JLabel(pocketName);
-            pocketLabel.setFont(new java.awt.Font("Serif", java.awt.Font.BOLD, 18));
-            pocketLabel.setPreferredSize(new Dimension(300, 30));
-            pocketRow.add(pocketLabel);
+        for (String pocketName : expensesByPocketName.keySet()) {
+            JPanel pocketCard = new JPanel();
+            pocketCard.setLayout(new BoxLayout(pocketCard, BoxLayout.Y_AXIS));
+            pocketCard.setPreferredSize(new Dimension(250, 120));
+            pocketCard.setBackground(Color.WHITE);
+            pocketCard.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+            pocketCard.setAlignmentY(Component.TOP_ALIGNMENT);
+
+            JLabel pocketLabel = new JLabel(pocketName, SwingConstants.CENTER);
+            pocketLabel.setFont(new Font("Serif", Font.BOLD, 18));
+            pocketLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            pocketCard.add(Box.createRigidArea(new Dimension(0, 10)));
+            pocketCard.add(pocketLabel);
 
             JButton downloadButton = new JButton("Download");
             ReportStyle.styleBlueButton(downloadButton);
+            downloadButton.setAlignmentX(Component.CENTER_ALIGNMENT);
             downloadButton.addActionListener(e -> downloadReport(email, pocketName, expensesByPocketName.get(pocketName)));
-            pocketRow.add(downloadButton);
+            pocketCard.add(Box.createRigidArea(new Dimension(0, 10)));
+            pocketCard.add(downloadButton);
 
-            pocketPanel.add(pocketRow);
+            pocketPanel.add(Box.createRigidArea(new Dimension(20, 0)));
+            pocketPanel.add(pocketCard);
         }
 
         JScrollPane scrollPane = new JScrollPane(pocketPanel);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
         // Chart Panel
@@ -100,19 +125,7 @@ public class Report extends JFrame {
 
         ChartPanel jChartPanel = new ChartPanel(chart);
         chartPanel.add(jChartPanel, BorderLayout.CENTER);
-        mainPanel.add(chartPanel, BorderLayout.NORTH);
-
-        JButton backButton = new JButton("Back");
-        ReportStyle.styleGreenButton(backButton);
-        backButton.addActionListener(e -> {
-            new StartPage(token);
-            dispose();
-        });
-
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        buttonPanel.setBackground(Color.WHITE);
-        buttonPanel.add(backButton);
-        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+        mainPanel.add(chartPanel, BorderLayout.SOUTH);
 
         add(mainPanel);
         setVisible(true);

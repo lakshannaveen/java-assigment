@@ -8,21 +8,23 @@ import java.awt.*;
 public class ReportStyle {
 
     public static void styleGreenButton(JButton button) {
-        button.setFont(new Font("Serif", Font.BOLD, 18));
+        button.setFont(new Font("Serif", Font.BOLD, 16));
         button.setBackground(new Color(34, 139, 34)); // Dark green
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
         button.setBorderPainted(false);
         button.setOpaque(true);
+        button.setPreferredSize(new Dimension(100, 30));
     }
 
     public static void styleBlueButton(JButton button) {
-        button.setFont(new Font("Serif", Font.BOLD, 18));
-        button.setBackground(Color.BLUE);
+        button.setFont(new Font("Serif", Font.BOLD, 16));
+        button.setBackground(new Color(30, 144, 255)); // Dodger blue
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
         button.setBorderPainted(false);
         button.setOpaque(true);
+        button.setPreferredSize(new Dimension(120, 30));
     }
 
     public static void styleTable(JTable table) {
