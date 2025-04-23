@@ -48,6 +48,10 @@ public class HomePage extends JFrame {
         loginButton = new JButton(bundle.getString("login"));
         registerButton = new JButton(bundle.getString("register"));
 
+        // Set button size
+        loginButton.setPreferredSize(new Dimension(150, 40));
+        registerButton.setPreferredSize(new Dimension(150, 40));
+
         // Language selection
         String[] languages = {"English", "Singlish"};
         languageComboBox = new JComboBox<>(languages);
