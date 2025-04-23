@@ -22,7 +22,6 @@ public class RegisterPage extends JFrame {
 
     public RegisterPage() {
         try {
-            // Get the current locale from HomePage
             bundle = ResourceBundle.getBundle("resources/messages",
                     HomePage.getCurrentLocale(),
                     new UTF8ResourceBundleControl());
@@ -38,7 +37,6 @@ public class RegisterPage extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Create the main panel and apply styles
         JPanel mainPanel = new JPanel(new BorderLayout());
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBorder(BorderFactory.createTitledBorder(bundle.getString("register") + " " + bundle.getString("form")));
@@ -46,7 +44,6 @@ public class RegisterPage extends JFrame {
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Create and add the components
         JLabel nameLabel = new JLabel(bundle.getString("name") + ":");
         nameField = new JTextField(20);
 
@@ -61,10 +58,8 @@ public class RegisterPage extends JFrame {
         backButton.setContentAreaFilled(false);
         backButton.setBorderPainted(false);
 
-        // Apply styles using the RegisterPageStyle class
         RegisterPageStyle.applyStyles(formPanel, nameField, emailField, passwordField, registerButton, backButton);
 
-        // Register button action
         registerButton.addActionListener(e -> {
             String name = nameField.getText();
             String email = emailField.getText();
@@ -90,33 +85,27 @@ public class RegisterPage extends JFrame {
                 return;
             }
 
-            // Create the user object
             User user = new User(name, email, password);
             if (userController.registerUser(user)) {
-                JOptionPane.showMessageDialog(this, bundle.getString("register.success"), "Success", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        bundle.getString("register.success") + "\n" +
+                                bundle.getString("email.sent.notification"),
+                        "Success", JOptionPane.INFORMATION_MESSAGE);
 
-                // Log the registration event
                 Logger.logRegister(email, "user");
-
-                dispose(); // Close the register page
-
-                // Generate JWT Token
+                dispose();
                 String token = generateJWT(email);
-
-                // Pass the token to the StartPage
-                new StartPage(token); // Use the generated token here
+                new StartPage(token);
             } else {
                 JOptionPane.showMessageDialog(this, bundle.getString("register.failed"), "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        // Back button action
         backButton.addActionListener(e -> {
-            dispose(); // Close register page
-            new HomePage(); // Navigate back to HomePage
+            dispose();
+            new HomePage();
         });
 
-        // Add components to the form panel with GridBagLayout
         gbc.gridx = 0;
         gbc.gridy = 0;
         formPanel.add(nameLabel, gbc);
@@ -147,15 +136,12 @@ public class RegisterPage extends JFrame {
         gbc.anchor = GridBagConstraints.CENTER;
         formPanel.add(registerButton, gbc);
 
-        // Add back button to the top-left corner of the main panel
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(backButton, BorderLayout.WEST);
 
-        // Add panels to the main panel
         mainPanel.add(topPanel, BorderLayout.NORTH);
         mainPanel.add(formPanel, BorderLayout.CENTER);
 
-        // Add main panel to the frame
         add(mainPanel);
         setVisible(true);
     }
@@ -168,13 +154,11 @@ public class RegisterPage extends JFrame {
 
     private String generateJWT(String email) {
         try {
-            // Define the JWT signing algorithm
-            Algorithm algorithm = Algorithm.HMAC256("1020"); // Use a secret key for signing
-            String token = JWT.create()
-                    .withClaim("email", email)  // Add email claim to the token
-                    .withExpiresAt(new Date(System.currentTimeMillis() + 3600000)) // Expiration time: 1 hour
-                    .sign(algorithm); // Sign and generate the token
-            return token;
+            Algorithm algorithm = Algorithm.HMAC256("1020");
+            return JWT.create()
+                    .withClaim("email", email)
+                    .withExpiresAt(new Date(System.currentTimeMillis() + 3600000))
+                    .sign(algorithm);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -182,12 +166,6 @@ public class RegisterPage extends JFrame {
     }
 
     public static void main(String[] args) {
-        // Run the RegisterPage
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new RegisterPage();
-            }
-        });
+        SwingUtilities.invokeLater(() -> new RegisterPage());
     }
 }
