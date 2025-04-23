@@ -27,6 +27,7 @@ public class StartPage extends JFrame {
     private JTextField searchField;
     private JButton searchButton;
     private JComboBox<String> searchTypeComboBox;
+    private boolean isPlaceholderText = true;
 
     public StartPage(String token) {
         this.token = token; // Store the token
@@ -116,18 +117,19 @@ public class StartPage extends JFrame {
         StartPageStyle.styleComboBox(searchTypeComboBox);
 
         // Search field and button
-        searchField = new JTextField("Search by expense name", 15); // Reduced column count
+        searchField = new JTextField(15); // Reduced column count
         StartPageStyle.styleSearchField(searchField);  // Apply styling for search field
+        updateSearchFieldPlaceholder(); // Set initial placeholder
         searchField.setForeground(Color.GRAY);  // Set initial placeholder color
+
         // Add FocusListener
         searchField.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
-                if (searchField.getText().equals("Search by expense name") ||
-                        searchField.getText().equals("Search by date (yyyy-mm-dd)") ||
-                        searchField.getText().equals("Search by amount")) {
+                if (isPlaceholderText) {
                     searchField.setText("");
                     searchField.setForeground(Color.BLACK);
+                    isPlaceholderText = false;
                 }
             }
 
@@ -135,6 +137,7 @@ public class StartPage extends JFrame {
             public void focusLost(FocusEvent e) {
                 if (searchField.getText().isEmpty()) {
                     updateSearchFieldPlaceholder();
+                    isPlaceholderText = true;
                 }
             }
         });
@@ -143,7 +146,9 @@ public class StartPage extends JFrame {
         searchTypeComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                updateSearchFieldPlaceholder();
+                if (isPlaceholderText || searchField.getText().isEmpty()) {
+                    updateSearchFieldPlaceholder();
+                }
             }
         });
 
@@ -154,7 +159,8 @@ public class StartPage extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String searchType = (String) searchTypeComboBox.getSelectedItem();
-                searchExpenses(email, searchField.getText().trim(), searchType);
+                String searchText = isPlaceholderText ? "" : searchField.getText().trim();
+                searchExpenses(email, searchText, searchType);
             }
         });
 
@@ -204,20 +210,15 @@ public class StartPage extends JFrame {
 
     private void updateSearchFieldPlaceholder() {
         String searchType = (String) searchTypeComboBox.getSelectedItem();
-        if (searchField.getText().isEmpty() ||
-                searchField.getText().equals("Search by expense name") ||
-                searchField.getText().equals("Search by date (yyyy-mm-dd)") ||
-                searchField.getText().equals("Search by amount")) {
-
-            if (searchType.equals("Expense Name")) {
-                searchField.setText("Search by expense name");
-            } else if (searchType.equals("Date")) {
-                searchField.setText("search by date");
-            } else {
-                searchField.setText("Search by amount");
-            }
-            searchField.setForeground(Color.GRAY);
+        if (searchType.equals("Expense Name")) {
+            searchField.setText("Search by expense name");
+        } else if (searchType.equals("Date")) {
+            searchField.setText("Search by date (yyyy-mm-dd)");
+        } else {
+            searchField.setText("Search by amount");
         }
+        searchField.setForeground(Color.GRAY);
+        isPlaceholderText = true;
     }
 
     private void loadExpenses(String email) {
@@ -312,7 +313,10 @@ public class StartPage extends JFrame {
 
         List<ExpenseModel> filteredExpenses;
 
-        if (searchType.equals("Expense Name")) {
+        if (searchTerm.isEmpty()) {
+            // If search term is empty, show all expenses
+            filteredExpenses = expenses;
+        } else if (searchType.equals("Expense Name")) {
             // Filter expenses by the search term using fuzzy matching for expense name
             LevenshteinDistance levenshtein = new LevenshteinDistance();
             filteredExpenses = expenses.stream()
