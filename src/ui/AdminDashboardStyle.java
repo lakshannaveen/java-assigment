@@ -2,48 +2,51 @@ package ui;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class AdminDashboardStyle {
 
     public static void applyFrameStyle(JFrame frame) {
-        // Set the look and feel to the system's look and feel
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        // Custom styling for frame
         frame.getContentPane().setBackground(Color.LIGHT_GRAY);
         frame.setFont(new Font("Arial", Font.PLAIN, 14));
     }
 
+    public static void applyHeaderStyle(JLabel label) {
+        label.setFont(new Font("Verdana", Font.BOLD, 20));
+        label.setForeground(new Color(30, 30, 60));
+        label.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
+    }
+
     public static void applyButtonStyle(JButton button) {
-        // Custom styling for buttons
-        button.setBackground(new Color(70, 130, 180)); // SteelBlue color
+        Color normalColor = new Color(70, 130, 180);  // SteelBlue
+        Color hoverColor = new Color(255, 255, 255, 180);  // semi-transparent white
+        button.setBackground(normalColor);
         button.setForeground(Color.WHITE);
         button.setFont(new Font("Arial", Font.BOLD, 14));
-        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20)); // Add padding for button text
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        // Add hover effect
+        button.setContentAreaFilled(false); // allow custom paint
+        button.setOpaque(true);
+
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                button.setBackground(new Color(100, 150, 220)); // Lighter blue on hover
+                button.setBackground(Color.WHITE);
+                button.setForeground(normalColor); // invert text color
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                button.setBackground(new Color(70, 130, 180)); // Reset to original
+                button.setBackground(normalColor);
+                button.setForeground(Color.WHITE);
             }
         });
-    }
-
-    public static void applyHeaderStyle(JLabel label) {
-        // Custom styling for labels
-        label.setForeground(new Color(70, 130, 180)); // SteelBlue color
-        label.setFont(new Font("Arial", Font.BOLD, 18));
-        label.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0)); // Add some space above and below
     }
 }
