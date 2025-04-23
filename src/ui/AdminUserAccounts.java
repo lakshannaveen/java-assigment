@@ -4,6 +4,7 @@ import controllers.UserController;
 import models.User;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -18,64 +19,67 @@ public class AdminUserAccounts extends JFrame {
         userController = new UserController();
 
         setTitle("Admin User Accounts");
-        setSize(800, 600);
+        setSize(700, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // Label for the title
+        // Title Label
         JLabel accountsLabel = new JLabel("User Accounts", SwingConstants.CENTER);
-        AdminUserAccountsStyle.applyModernStyle(accountsLabel); // Apply modern label style
-        accountsLabel.setFont(new Font("Segoe UI", Font.BOLD, 24)); // Set modern font style
-        accountsLabel.setForeground(new Color(30, 144, 255)); // Set color for title (blue)
+        AdminUserAccountsStyle.applyModernStyle(accountsLabel);
+        accountsLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        accountsLabel.setForeground(new Color(70, 130, 180)); // Soft blue
         add(accountsLabel, BorderLayout.NORTH);
 
-        // Table to display user accounts
+        // Table
         String[] columnNames = {"Name", "Email"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Make the table read-only
+                return false;
             }
         };
+
         JTable table = new JTable(tableModel);
-        AdminUserAccountsStyle.applyModernTableStyle(table); // Apply modern table styles
+        AdminUserAccountsStyle.applyModernTableStyle(table);
+
+        // Center cell content
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+        table.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
+
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);
 
-        // Load user accounts and populate the table
+        // Load user data
         List<User> users = userController.getAllUsers();
         for (User user : users) {
             Object[] rowData = {user.getName(), user.getEmail()};
             tableModel.addRow(rowData);
         }
 
-        // Back button to return to AdminDashboard
+        // Back Button
         JButton backButton = new JButton("Back");
-        AdminUserAccountsStyle.applyModernButtonStyle(backButton); // Apply modern button styles
+        AdminUserAccountsStyle.applyModernButtonStyle(backButton);
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new AdminDashboard(); // Open Admin Dashboard
-                dispose(); // Close the current frame
+                new AdminDashboard();
+                dispose();
             }
         });
 
         JPanel buttonPanel = new JPanel();
-        AdminUserAccountsStyle.applyPanelStyle(buttonPanel); // Apply style to the panel
+        AdminUserAccountsStyle.applyPanelStyle(buttonPanel);
         buttonPanel.add(backButton);
         add(buttonPanel, BorderLayout.SOUTH);
 
-        AdminUserAccountsStyle.applyStyle(this); // Apply JFrame styles
+        AdminUserAccountsStyle.applyStyle(this);
         setVisible(true);
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new AdminUserAccounts();
-            }
-        });
+        SwingUtilities.invokeLater(() -> new AdminUserAccounts());
     }
 }
