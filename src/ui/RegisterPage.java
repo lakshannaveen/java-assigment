@@ -95,16 +95,37 @@ public class RegisterPage extends JFrame {
                 Logger.logRegister(email, "user");
                 String token = generateJWT(email);
 
+                JPanel successPanel = new JPanel(new BorderLayout());
                 JLabel successLabel = new JLabel("<html>" +
                         bundle.getString("register.success") + "<br>" +
                         bundle.getString("email.sent.notification") + "</html>");
                 successLabel.setForeground(new Color(0, 153, 0)); // green text
                 successLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
+                successLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-                JOptionPane.showMessageDialog(this, successLabel, "Success", JOptionPane.INFORMATION_MESSAGE);
+                JButton okButton = new JButton("OK");
+                okButton.setBackground(new Color(0, 153, 76));
+                okButton.setForeground(Color.WHITE);
+                okButton.setFocusPainted(false);
+                okButton.setFont(new Font("SansSerif", Font.BOLD, 12));
+                okButton.addActionListener(ev -> {
+                    successPanel.setVisible(false);
+                    dispose();
+                    new StartPage(token);
+                });
 
-                dispose();
-                new StartPage(token);
+                JPanel buttonPanel = new JPanel();
+                buttonPanel.add(okButton);
+
+                successPanel.add(successLabel, BorderLayout.CENTER);
+                successPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+                JDialog dialog = new JDialog(this, "Success", true);
+                dialog.setContentPane(successPanel);
+                dialog.pack();
+                dialog.setLocationRelativeTo(this);
+                dialog.setVisible(true);
+
             } else {
                 JOptionPane.showMessageDialog(this, bundle.getString("register.failed"), "Error", JOptionPane.ERROR_MESSAGE);
             }
