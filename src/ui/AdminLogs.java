@@ -10,11 +10,11 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -33,41 +33,41 @@ public class AdminLogs extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // Apply blue theme
+        // Apply light blue theme
         getContentPane().setBackground(new Color(240, 245, 255));
 
-        // Create header panel with back button and title
+        // Header panel
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(new Color(30, 144, 255));
         headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        // Back button - white text, no background
+        // Back button
         JButton backButton = new JButton("← Back to Dashboard");
         backButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
         backButton.setForeground(Color.WHITE);
         backButton.setContentAreaFilled(false);
         backButton.setBorderPainted(false);
         backButton.setFocusPainted(false);
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-                SwingUtilities.invokeLater(() -> {
-                    new AdminDashboard().setVisible(true);
-                });
-            }
+        backButton.addActionListener(e -> {
+            dispose();
+            SwingUtilities.invokeLater(() -> new AdminDashboard().setVisible(true));
         });
         headerPanel.add(backButton, BorderLayout.WEST);
 
-        // Title label
+        // Title Label Centered Properly
         JLabel titleLabel = new JLabel("ADMIN LOGIN LOGS", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
         titleLabel.setForeground(Color.WHITE);
-        headerPanel.add(titleLabel, BorderLayout.CENTER);
+
+        // A center panel just for title to make it stay centered
+        JPanel centerTitlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        centerTitlePanel.setOpaque(false); // transparent
+        centerTitlePanel.add(titleLabel);
+        headerPanel.add(centerTitlePanel, BorderLayout.CENTER);
 
         add(headerPanel, BorderLayout.NORTH);
 
-        // Main content panel
+        // Content Panel
         JPanel contentPanel = new JPanel(new GridLayout(1, 2, 20, 20));
         contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         contentPanel.setBackground(new Color(240, 245, 255));
@@ -78,13 +78,21 @@ public class AdminLogs extends JFrame {
         table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         table.setRowHeight(25);
 
-        // Custom header style
+        // Table Header Styling
         JTableHeader header = table.getTableHeader();
         header.setFont(new Font("Segoe UI", Font.BOLD, 14));
         header.setBackground(Color.BLACK);
         header.setForeground(Color.WHITE);
-        header.setReorderingAllowed(false);
-        SwingUtilities.updateComponentTreeUI(header);
+        header.setOpaque(true);
+
+        // Fix white slash: override header renderer
+        DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer();
+        headerRenderer.setBackground(Color.BLACK);
+        headerRenderer.setForeground(Color.WHITE);
+        headerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setHeaderRenderer(headerRenderer);
+        }
 
         JScrollPane tableScrollPane = new JScrollPane(table);
         tableScrollPane.setBorder(BorderFactory.createCompoundBorder(
@@ -93,7 +101,7 @@ public class AdminLogs extends JFrame {
         ));
         contentPanel.add(tableScrollPane);
 
-        // Chart panel
+        // Chart Panel
         JFreeChart chart = createScatterChart();
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setBorder(BorderFactory.createCompoundBorder(
@@ -105,13 +113,8 @@ public class AdminLogs extends JFrame {
 
         add(contentPanel, BorderLayout.CENTER);
 
-        // Load data
+        // Load data from file
         loadAdminLogs();
-
-        SwingUtilities.invokeLater(() -> {
-            validate();
-            repaint();
-        });
     }
 
     private void loadAdminLogs() {
