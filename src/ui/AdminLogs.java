@@ -11,6 +11,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -40,18 +41,20 @@ public class AdminLogs extends JFrame {
         headerPanel.setBackground(new Color(30, 144, 255));
         headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        // Back button
+        // Back button - white text, no background
         JButton backButton = new JButton("← Back to Dashboard");
         backButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
         backButton.setForeground(Color.WHITE);
-        backButton.setBackground(new Color(70, 130, 180));
-        backButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        backButton.setContentAreaFilled(false);
+        backButton.setBorderPainted(false);
         backButton.setFocusPainted(false);
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
-                new AdminDashboard().setVisible(true);
+                SwingUtilities.invokeLater(() -> {
+                    new AdminDashboard().setVisible(true);
+                });
             }
         });
         headerPanel.add(backButton, BorderLayout.WEST);
@@ -64,19 +67,24 @@ public class AdminLogs extends JFrame {
 
         add(headerPanel, BorderLayout.NORTH);
 
-        // Main content panel with table and chart
+        // Main content panel
         JPanel contentPanel = new JPanel(new GridLayout(1, 2, 20, 20));
         contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         contentPanel.setBackground(new Color(240, 245, 255));
 
-        // Table setup with scroll pane - only for admin data
+        // Table setup
         tableModel = new DefaultTableModel(new String[]{"Event", "User Type", "Username", "Date & Time"}, 0);
         table = new JTable(tableModel);
         table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         table.setRowHeight(25);
-        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
-        table.getTableHeader().setBackground(new Color(70, 130, 180));
-        table.getTableHeader().setForeground(Color.WHITE);
+
+        // Custom header style
+        JTableHeader header = table.getTableHeader();
+        header.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        header.setBackground(Color.BLACK);
+        header.setForeground(Color.WHITE);
+        header.setReorderingAllowed(false);
+        SwingUtilities.updateComponentTreeUI(header);
 
         JScrollPane tableScrollPane = new JScrollPane(table);
         tableScrollPane.setBorder(BorderFactory.createCompoundBorder(
@@ -97,8 +105,13 @@ public class AdminLogs extends JFrame {
 
         add(contentPanel, BorderLayout.CENTER);
 
-        // Load data - only admin related
+        // Load data
         loadAdminLogs();
+
+        SwingUtilities.invokeLater(() -> {
+            validate();
+            repaint();
+        });
     }
 
     private void loadAdminLogs() {
@@ -108,7 +121,6 @@ public class AdminLogs extends JFrame {
                 String[] parts = line.split(",\\s*");
                 if (parts.length == 4) {
                     String userType = parts[1].split(": ")[1];
-                    // Only show admin-related entries
                     if (userType.equalsIgnoreCase("admin")) {
                         String event = parts[0].split(": ")[1];
                         String username = parts[2].split(": ")[1];
@@ -158,9 +170,7 @@ public class AdminLogs extends JFrame {
                 true, true, false
         );
 
-        // Apply blue theme to chart
         chart.setBackgroundPaint(new Color(240, 245, 255));
-
         XYPlot plot = chart.getXYPlot();
         plot.setBackgroundPaint(Color.WHITE);
         plot.setDomainGridlinePaint(new Color(200, 220, 255));
