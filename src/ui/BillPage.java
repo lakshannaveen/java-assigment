@@ -1,10 +1,10 @@
 package ui;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import controllers.BillController;
 import models.BillModel;
 import java.awt.Dialog.ModalityType;
-
-import org.bson.types.ObjectId;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,19 +30,31 @@ public class BillPage extends JFrame {
 
     public BillPage(String token) {
         this.token = token;
-        this.userEmail = extractEmailFromToken(token);
+        this.userEmail = getEmailFromToken(token); // Properly decode JWT token
         this.billController = new BillController();
+
+        if (this.userEmail == null) {
+            JOptionPane.showMessageDialog(this, "Invalid session. Please login again.", "Error", JOptionPane.ERROR_MESSAGE);
+            dispose();
+            new HomePage();
+            return;
+        }
 
         initializeUI();
     }
 
-    private String extractEmailFromToken(String token) {
-        int emailIndex = token.indexOf("email:") + 6;
-        return (emailIndex >= 6) ? token.substring(emailIndex).trim() : "unknown@example.com";
+    private String getEmailFromToken(String token) {
+        try {
+            DecodedJWT decodedJWT = JWT.decode(token);
+            return decodedJWT.getClaim("email").asString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private void initializeUI() {
-        setTitle("My Storage Bill");
+        setTitle("My Storage Bill - " + userEmail);
         setSize(1200, 800);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -51,15 +63,14 @@ public class BillPage extends JFrame {
         mainPanel.setBackground(Color.WHITE);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
 
-        // Top panel with back button and title - changed to black background
+        // Top panel with back button and title
         JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(Color.BLACK); // Changed to black
+        topPanel.setBackground(Color.BLACK);
         topPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        // White back button with black text
         JButton backButton = new JButton("Back");
-        backButton.setBackground(Color.black);
-        backButton.setForeground(Color.white);
+        backButton.setBackground(Color.BLACK);
+        backButton.setForeground(Color.WHITE);
         backButton.setFont(new Font("Arial", Font.BOLD, 14));
         backButton.setFocusPainted(false);
         backButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
@@ -71,8 +82,14 @@ public class BillPage extends JFrame {
 
         JLabel titleLabel = new JLabel("My Bill Storage", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
-        titleLabel.setForeground(Color.WHITE); // White text on black background
+        titleLabel.setForeground(Color.WHITE);
         topPanel.add(titleLabel, BorderLayout.CENTER);
+
+        // Add email label
+        JLabel emailLabel = new JLabel(userEmail, SwingConstants.RIGHT);
+        emailLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        emailLabel.setForeground(Color.WHITE);
+        topPanel.add(emailLabel, BorderLayout.EAST);
 
         mainPanel.add(topPanel, BorderLayout.NORTH);
 
@@ -155,7 +172,7 @@ public class BillPage extends JFrame {
                 cardPanel.setBackground(Color.WHITE);
                 cardPanel.setMaximumSize(new Dimension(1100, 200));
 
-                // Image preview with zoom capability
+                // Image preview
                 JLabel imageLabel = new JLabel();
                 try {
                     ImageIcon imageIcon = new ImageIcon(bill.getFilePath());
@@ -163,7 +180,6 @@ public class BillPage extends JFrame {
                     imageLabel.setIcon(new ImageIcon(scaledImg));
                     imageLabel.setHorizontalAlignment(JLabel.CENTER);
 
-                    // Add mouse listener for zoom functionality
                     imageLabel.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
@@ -237,7 +253,6 @@ public class BillPage extends JFrame {
             ImageIcon originalIcon = new ImageIcon(imagePath);
             Image image = originalIcon.getImage();
 
-            // Calculate scaling to fit within dialog while maintaining aspect ratio
             int dialogWidth = 780;
             int dialogHeight = 560;
             double widthRatio = (double) dialogWidth / image.getWidth(null);
@@ -254,7 +269,6 @@ public class BillPage extends JFrame {
             scrollPane.setPreferredSize(new Dimension(dialogWidth, dialogHeight));
             zoomDialog.add(scrollPane);
 
-            // Add right-click save option
             zoomLabel.setComponentPopupMenu(createImagePopupMenu(imagePath));
 
         } catch (Exception e) {
@@ -375,7 +389,7 @@ public class BillPage extends JFrame {
             Files.copy(selectedFile.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
 
             BillModel bill = new BillModel(
-                    userEmail,
+                    userEmail, // Using the email from the decoded token
                     selectedFile.getName(),
                     Files.probeContentType(selectedFile.toPath()),
                     targetPath.toString()
