@@ -60,13 +60,14 @@ public class AdminDashboard extends JFrame {
         });
         timer.start();
 
-        // Buttons - Removed the showChartButton
+        // Buttons
         JButton showLogsButton = new JButton("Show Logs");
         JButton accountsButton = new JButton("Accounts");
         JButton adminsButton = new JButton("Manage Admins");
+        JButton adminLogsButton = new JButton("Admin Logs");
         JButton logoutButton = new JButton("Logout");
 
-        JButton[] buttons = {showLogsButton, accountsButton, adminsButton, logoutButton};
+        JButton[] buttons = {showLogsButton, accountsButton, adminsButton, adminLogsButton, logoutButton};
 
         for (JButton button : buttons) {
             AdminDashboardStyle.applyButtonStyle(button);
@@ -96,6 +97,10 @@ public class AdminDashboard extends JFrame {
             new AdminManage();
             dispose();
         });
+        adminLogsButton.addActionListener(e -> {
+            new AdminLogs().setVisible(true);
+            dispose();
+        });
         logoutButton.addActionListener(e -> {
             new HomePage();
             dispose();
@@ -104,6 +109,7 @@ public class AdminDashboard extends JFrame {
         AdminDashboardStyle.applyFrameStyle(this);
         setVisible(true);
     }
+
 
     private JPanel createLoginTimeChartPanel() {
         // Get login data by hour
