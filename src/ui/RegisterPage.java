@@ -54,6 +54,11 @@ public class RegisterPage extends JFrame {
         passwordField = new JPasswordField(20);
 
         registerButton = new JButton(bundle.getString("register"));
+        registerButton.setBackground(new Color(0, 153, 76)); // green
+        registerButton.setForeground(Color.WHITE);
+        registerButton.setOpaque(true);
+        registerButton.setBorderPainted(false);
+
         backButton = new JButton(bundle.getString("back"));
         backButton.setContentAreaFilled(false);
         backButton.setBorderPainted(false);
@@ -87,14 +92,18 @@ public class RegisterPage extends JFrame {
 
             User user = new User(name, email, password);
             if (userController.registerUser(user)) {
-                JOptionPane.showMessageDialog(this,
-                        bundle.getString("register.success") + "\n" +
-                                bundle.getString("email.sent.notification"),
-                        "Success", JOptionPane.INFORMATION_MESSAGE);
-
                 Logger.logRegister(email, "user");
-                dispose();
                 String token = generateJWT(email);
+
+                JLabel successLabel = new JLabel("<html>" +
+                        bundle.getString("register.success") + "<br>" +
+                        bundle.getString("email.sent.notification") + "</html>");
+                successLabel.setForeground(new Color(0, 153, 0)); // green text
+                successLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
+
+                JOptionPane.showMessageDialog(this, successLabel, "Success", JOptionPane.INFORMATION_MESSAGE);
+
+                dispose();
                 new StartPage(token);
             } else {
                 JOptionPane.showMessageDialog(this, bundle.getString("register.failed"), "Error", JOptionPane.ERROR_MESSAGE);

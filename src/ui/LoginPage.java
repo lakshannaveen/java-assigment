@@ -84,14 +84,11 @@ public class LoginPage extends JFrame {
                         JOptionPane.showMessageDialog(null, "Navigating to admin login...");
                         dispose();
                         new AdminLogin();
-                    }
-                    else {
+                    } else {
                         JOptionPane.showMessageDialog(null, "Admin click count: " + loginAttempts);
                     }
                     return;
-                }
-                else {
-                    // Perform regular validation for non-admin users
+                } else {
                     if (!isValidEmail(email)) {
                         JOptionPane.showMessageDialog(null, getLocalizedString("invalid.email"));
                         return;
@@ -104,12 +101,10 @@ public class LoginPage extends JFrame {
 
                     String token = authenticateUser(email, password);
                     if (token != null) {
-                        JOptionPane.showMessageDialog(null, getLocalizedString("login.success", "Login successful!"));
+                        showSuccessDialog(getLocalizedString("login.success", "Login successful!"));
 
-                        // Log the login information
                         Logger.logLogin(email, "user");
 
-                        // Pass token to StartPage
                         dispose();
                         new StartPage(token);
                     } else {
@@ -132,7 +127,6 @@ public class LoginPage extends JFrame {
         formPanel.add(emailLabel, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 0;
         formPanel.add(emailField, gbc);
 
         gbc.gridx = 0;
@@ -140,7 +134,6 @@ public class LoginPage extends JFrame {
         formPanel.add(passwordLabel, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 1;
         formPanel.add(passwordField, gbc);
 
         gbc.gridx = 1;
@@ -157,6 +150,32 @@ public class LoginPage extends JFrame {
 
         add(mainPanel);
         setVisible(true);
+    }
+
+    private void showSuccessDialog(String message) {
+        JDialog dialog = new JDialog(this, "Success", true);
+        dialog.setSize(300, 150);
+        dialog.setLocationRelativeTo(this);
+        dialog.setLayout(new BorderLayout());
+
+        JLabel messageLabel = new JLabel(message, SwingConstants.CENTER);
+        messageLabel.setForeground(new Color(0, 128, 0)); // Green text
+        messageLabel.setFont(new Font("Arial", Font.BOLD, 14));
+
+        JButton okButton = new JButton("OK");
+        okButton.setBackground(new Color(0, 128, 0)); // Green background
+        okButton.setForeground(Color.WHITE); // White text
+        okButton.setFocusPainted(false);
+        okButton.setFont(new Font("Arial", Font.BOLD, 12));
+        okButton.addActionListener(e -> dialog.dispose());
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(okButton);
+
+        dialog.add(messageLabel, BorderLayout.CENTER);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+        dialog.setVisible(true);
     }
 
     private String getLocalizedString(String key) {
@@ -180,7 +199,6 @@ public class LoginPage extends JFrame {
             Document user = collection.find(query).first();
 
             if (user != null) {
-                // Generate JWT token after successful authentication
                 return generateJwtToken(email);
             } else {
                 return null;
@@ -193,11 +211,10 @@ public class LoginPage extends JFrame {
 
     private String generateJwtToken(String email) {
         try {
-            long expirationTime = 365 * 24 * 60 * 60 * 1000L; // 1 year in milliseconds
+            long expirationTime = 365L * 24 * 60 * 60 * 1000; // 1 year
             Date expirationDate = new Date(System.currentTimeMillis() + expirationTime);
 
             Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY);
-
             return JWT.create()
                     .withSubject(email)
                     .withClaim("email", email)
@@ -216,11 +233,6 @@ public class LoginPage extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new LoginPage();
-            }
-        });
+        SwingUtilities.invokeLater(() -> new LoginPage());
     }
 }
