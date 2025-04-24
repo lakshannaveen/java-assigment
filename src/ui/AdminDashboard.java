@@ -67,18 +67,28 @@ public class AdminDashboard extends JFrame {
         JButton adminLogsButton = new JButton("Admin Logs");
         JButton logoutButton = new JButton("Logout");
 
-        JButton[] buttons = {showLogsButton, accountsButton, adminsButton, adminLogsButton, logoutButton};
+        // Apply styles to buttons
+        AdminDashboardStyle.applyButtonStyle(showLogsButton);
+        AdminDashboardStyle.applyButtonStyle(accountsButton);
+        AdminDashboardStyle.applyButtonStyle(adminsButton);
+        AdminDashboardStyle.applyButtonStyle(adminLogsButton);
+        AdminDashboardStyle.applyLogoutButtonStyle(logoutButton); // Special style for logout button
 
-        for (JButton button : buttons) {
-            AdminDashboardStyle.applyButtonStyle(button);
-            button.setPreferredSize(new Dimension(150, 40));
-        }
+        // Set button sizes
+        Dimension buttonSize = new Dimension(150, 40);
+        showLogsButton.setPreferredSize(buttonSize);
+        accountsButton.setPreferredSize(buttonSize);
+        adminsButton.setPreferredSize(buttonSize);
+        adminLogsButton.setPreferredSize(buttonSize);
+        logoutButton.setPreferredSize(buttonSize);
 
         JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.setOpaque(false);
-        for (JButton button : buttons) {
-            buttonPanel.add(button);
-        }
+        buttonPanel.add(showLogsButton);
+        buttonPanel.add(accountsButton);
+        buttonPanel.add(adminsButton);
+        buttonPanel.add(adminLogsButton);
+        buttonPanel.add(logoutButton);
 
         mainPanel.add(buttonPanel, BorderLayout.NORTH);
 
@@ -88,6 +98,7 @@ public class AdminDashboard extends JFrame {
 
         add(mainPanel);
 
+        // Button actions
         showLogsButton.addActionListener(e -> showLogs());
         accountsButton.addActionListener(e -> {
             new AdminUserAccounts();
@@ -109,7 +120,6 @@ public class AdminDashboard extends JFrame {
         AdminDashboardStyle.applyFrameStyle(this);
         setVisible(true);
     }
-
 
     private JPanel createLoginTimeChartPanel() {
         // Get login data by hour
@@ -232,6 +242,7 @@ public class AdminDashboard extends JFrame {
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton downloadPdfButton = new JButton("Download PDF");
+        AdminDashboardStyle.applyButtonStyle(downloadPdfButton);
 
         downloadPdfButton.addActionListener(e -> {
             try {
